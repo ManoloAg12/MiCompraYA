@@ -8,6 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.micompra.micompraya.models.Usuario;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -19,39 +21,8 @@ public class MiCompraYaApplication {
     }
 
     @Bean
-    CommandLineRunner demo(UsuarioRepository usuarioRepository) {
-        return (args) -> {
-            //Sirve para buscar todos los usuarios
-            //for (Usuario u : usuarioRepository.findAll()) {
-                //System.out.println(" - " + u.getId() + " ; " + u.getNombre() + " ; " + u.getRol() );
-            //}
-
-            //sirve para buscar por nombre del usuario de tipo Optional
-            Optional<Usuario> u = usuarioRepository.findByUsuario("Carlos");
-            if (u.isPresent()) {
-                System.out.println(" - " + u.get().getId() + " ; " + u.get().getUsuario() + " ; " + u.get().getRol() );
-            }
-
-
-
-            //sirve para usar save
-            //Usuario u = new Usuario();
-            //u.setNombre("Pepe");
-            //u.setCorreo("pepe@pepe");
-            //u.setContrasena("1234");
-            //u.setRol(new Rol(1, "admin"));
-            //u.setFechaRegistro(LocalDate.now());
-            //u.setEstado(new Estado(1, "activo"));
-            //u = usuarioRepository.save(u);
-            //System.out.println(" - " + u.getId() + " - " + u.getNombre());
-            //System.out.println("Prueba completa" );
-
-            //sirve para eliminar el usuario
-
-            //usuarioRepository.deleteById(11);
-
-            //sirve para buscar por usuario
-        };
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 }

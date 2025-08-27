@@ -46,8 +46,14 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     @Query(nativeQuery = true, value = "SELECT * FROM obtener_usuarios_activos()")
     List<Usuario> obtenerUsuariosActivos();
 
+    List<Usuario> findAllEstado(String estado);
+
+    List<Usuario> findAllById(Integer idEstado);
+
     //llamar un procedimiento almacenado
     @Procedure(name = "eliminar_usuario_inactivos")
     void eliminarUsuariosInactivos();
+
+    List<Usuario> findByEstado(String estado);
 
 }
