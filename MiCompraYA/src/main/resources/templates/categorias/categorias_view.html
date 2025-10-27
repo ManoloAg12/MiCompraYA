@@ -1,0 +1,365 @@
+<div th:fragment="content" class="min-h-screen bg-gray-50">
+    <div class="container mx-auto px-4 py-6">
+        <div class="mb-8">
+            <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-6">
+                <a href="/" class="hover:text-green-600 transition-colors cursor-pointer">
+                    <i class="ri-home-line mr-1"></i>Inicio
+                </a>
+                <i class="ri-arrow-right-s-line text-gray-400"></i>
+                <span class="text-green-600 font-medium">Categorías</span>
+            </nav>
+
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Todas las Categorías</h1>
+                    <p class="text-gray-600">Encuentra todo lo que necesitas para tu hogar organizados por categorías</p>
+                </div>
+                <button class="mt-4 md:mt-0 flex items-center space-x-2 text-green-600 hover:text-green-700 transition-colors cursor-pointer whitespace-nowrap">
+                    <i class="ri-arrow-left-line"></i>
+                    <span>Volver al Inicio</span>
+                </button>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                <h3 class="text-sm font-medium text-gray-700 mb-3">Acceso Rápido:</h3>
+                <div class="flex flex-wrap gap-2">
+                    <a href="/offers" class="flex items-center space-x-2 px-3 py-2 bg-gray-50 hover:bg-green-50 text-gray-700 hover:text-green-600 rounded-md transition-colors text-sm cursor-pointer whitespace-nowrap">
+                        <i class="ri-fire-line text-sm"></i>
+                        <span>Ofertas del Día</span>
+                    </a>
+                    <a href="/new" class="flex items-center space-x-2 px-3 py-2 bg-gray-50 hover:bg-green-50 text-gray-700 hover:text-green-600 rounded-md transition-colors text-sm cursor-pointer whitespace-nowrap">
+                        <i class="ri-star-line text-sm"></i>
+                        <span>Nuevos Productos</span>
+                    </a>
+                    <a href="/bestsellers" class="flex items-center space-x-2 px-3 py-2 bg-gray-50 hover:bg-green-50 text-gray-700 hover:text-green-600 rounded-md transition-colors text-sm cursor-pointer whitespace-nowrap">
+                        <i class="ri-trophy-line text-sm"></i>
+                        <span>Más Vendidos</span>
+                    </a>
+                    <a href="/organic" class="flex items-center space-x-2 px-3 py-2 bg-gray-50 hover:bg-green-50 text-gray-700 hover:text-green-600 rounded-md transition-colors text-sm cursor-pointer whitespace-nowrap">
+                        <i class="ri-leaf-line text-sm"></i>
+                        <span>Orgánicos</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <div class="relative mb-6">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="ri-search-line text-gray-400 text-lg"></i>
+                </div>
+                <input class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm" placeholder="Buscar categorías o productos..." type="text" value="">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ordenar por:</label>
+                    <div class="relative">
+                        <select class="w-full pr-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm cursor-pointer">
+                            <option value="alphabetical">Alfabético</option>
+                            <option value="popular">Más Popular</option>
+                            <option value="new">Nuevos Productos</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                            <i class="ri-arrow-down-s-line text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Rango de Precio:</label>
+                    <div class="relative">
+                        <select class="w-full pr-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm cursor-pointer">
+                            <option value="all">Todos</option>
+                            <option value="0-50">$0 - $50</option>
+                            <option value="50-100">$50 - $100</option>
+                            <option value="100+">$100+</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                            <i class="ri-arrow-down-s-line text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Disponibilidad:</label>
+                    <div class="relative">
+                        <select class="w-full pr-8 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm cursor-pointer">
+                            <option value="all">Todos</option>
+                            <option value="available">Disponible</option>
+                            <option value="limited">Stock Limitado</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                            <i class="ri-arrow-down-s-line text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ofertas Especiales:</label>
+                    <label class="flex items-center cursor-pointer">
+                        <input class="rounded border-gray-300 text-green-600 focus:ring-green-500" type="checkbox">
+                        <span class="ml-2 text-sm text-gray-700">Solo ofertas</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button class="px-4 py-2 text-sm text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors cursor-pointer whitespace-nowrap">
+                    <i class="ri-close-line mr-1"></i>Limpiar Filtros
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-12">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Categorías Principales</h2>
+                <span class="text-sm text-gray-500">6 categorías encontradas</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Categoría 1 -->
+                <div class="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow duration-200 ">
+                    <div class="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200 text-blue-800 border-b p-6 rounded-t-lg cursor-pointer ">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-12 h-12 text-blue-600 flex items-center justify-center">
+                                <i class="ri-cup-line text-2xl"></i>
+                            </div>
+                            <span class="text-sm font-medium bg-white/20 px-2 py-1 rounded-full">127 productos</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Lácteos</h3>
+                        <p class="text-sm opacity-90 mb-4">Leche fresca, quesos artesanales y yogures naturales</p>
+                        <div class="flex items-center justify-between">
+                            <button class="text-sm font-medium hover:underline cursor-pointer whitespace-nowrap">Ver Todos</button>
+                            <i class="ri-arrow-down-s-line text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categoría 2 -->
+                <div class="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow duration-200">
+                    <div class="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200 text-orange-800 border-b p-6 rounded-t-lg cursor-pointer">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-12 h-12 text-orange-600 flex items-center justify-center">
+                                <i class="ri-apple-line text-2xl"></i>
+                            </div>
+                            <span class="text-sm font-medium bg-white/20 px-2 py-1 rounded-full">203 productos</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Frutas</h3>
+                        <p class="text-sm opacity-90 mb-4">Frutas frescas de temporada y tropicales</p>
+                        <div class="flex items-center justify-between">
+                            <button class="text-sm font-medium hover:underline cursor-pointer whitespace-nowrap">Ver Todos</button>
+                            <i class="ri-arrow-down-s-line text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categoría 3 -->
+                <div class="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow duration-200">
+                    <div class="bg-gradient-to-r from-green-50 to-green-100 border-green-200 text-green-800 border-b p-6 rounded-t-lg cursor-pointer">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-12 h-12 text-green-600 flex items-center justify-center">
+                                <i class="ri-leaf-line text-2xl"></i>
+                            </div>
+                            <span class="text-sm font-medium bg-white/20 px-2 py-1 rounded-full">185 productos</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Vegetales</h3>
+                        <p class="text-sm opacity-90 mb-4">Verduras frescas, orgánicas y de la huerta</p>
+                        <div class="flex items-center justify-between">
+                            <button class="text-sm font-medium hover:underline cursor-pointer whitespace-nowrap">Ver Todos</button>
+                            <i class="ri-arrow-down-s-line text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categoría 4 -->
+                <div class="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow duration-200">
+                    <div class="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200 text-purple-800 border-b p-6 rounded-t-lg cursor-pointer">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-12 h-12 text-purple-600 flex items-center justify-center">
+                                <i class="ri-shopping-bag-line text-2xl"></i>
+                            </div>
+                            <span class="text-sm font-medium bg-white/20 px-2 py-1 rounded-full">312 productos</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Abarrotes</h3>
+                        <p class="text-sm opacity-90 mb-4">Productos básicos para tu despensa diaria</p>
+                        <div class="flex items-center justify-between">
+                            <button class="text-sm font-medium hover:underline cursor-pointer whitespace-nowrap">Ver Todos</button>
+                            <i class="ri-arrow-down-s-line text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categoría 5 -->
+                <div class="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow duration-200">
+                    <div class="bg-gradient-to-r from-teal-50 to-teal-100 border-teal-200 text-teal-800 border-b p-6 rounded-t-lg cursor-pointer">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-12 h-12 text-teal-600 flex items-center justify-center">
+                                <i class="ri-cup-fill text-2xl"></i>
+                            </div>
+                            <span class="text-sm font-medium bg-white/20 px-2 py-1 rounded-full">156 productos</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Bebidas</h3>
+                        <p class="text-sm opacity-90 mb-4">Jugos naturales, bebidas refrescantes y más</p>
+                        <div class="flex items-center justify-between">
+                            <button class="text-sm font-medium hover:underline cursor-pointer whitespace-nowrap">Ver Todos</button>
+                            <i class="ri-arrow-down-s-line text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categoría 6 -->
+                <div class="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow duration-200">
+                    <div class="bg-gradient-to-r from-red-50 to-red-100 border-red-200 text-red-800 border-b p-6 rounded-t-lg cursor-pointer">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-12 h-12 text-red-600 flex items-center justify-center">
+                                <i class="ri-restaurant-2-line text-2xl"></i>
+                            </div>
+                            <span class="text-sm font-medium bg-white/20 px-2 py-1 rounded-full">98 productos</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Carnes y Pescados</h3>
+                        <p class="text-sm opacity-90 mb-4">Carnes frescas y pescados del día</p>
+                        <div class="flex items-center justify-between">
+                            <button class="text-sm font-medium hover:underline cursor-pointer whitespace-nowrap">Ver Todos</button>
+                            <i class="ri-arrow-down-s-line text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-12">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Categorías Populares</h2>
+                <div class="hidden md:flex items-center space-x-2">
+                    <button class="w-10 h-10 rounded-full border flex items-center justify-center transition-colors cursor-pointer border-gray-200 text-gray-300 cursor-not-allowed" disabled="">
+                        <i class="ri-arrow-left-s-line text-lg"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-full border flex items-center justify-center transition-colors cursor-pointer border-green-300 text-green-600 hover:bg-green-50">
+                        <i class="ri-arrow-right-s-line text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="relative">
+                <div class="flex space-x-4 overflow-x-auto scrollbar-hide pb-2" style="scrollbar-width: none;">
+                    <!-- Tarjeta 1 -->
+                    <div class="flex-shrink-0 w-72 bg-white rounded-lg shadow-sm border hover:shadow-md transition-all duration-200 cursor-pointer group">
+                        <div class="relative overflow-hidden rounded-t-lg">
+                            <img alt="Frutas Orgánicas" class="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-200" src="https://readdy.ai/api/search-image?query=Fresh%20organic%20fruits%20display%20with%20vibrant%20colors%20including%20apples%20oranges%20bananas%20berries%20in%20a%20clean%20white%20background%20modern%20grocery%20store%20setting%20with%20natural%20lighting%20professional%20food%20photography&amp;width=300&amp;height=200&amp;seq=pop1&amp;orientation=landscape">
+                            <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-200"></div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-bold text-gray-900 group-hover:text-green-600 transition-colors">Frutas Orgánicas</h3>
+                                <span class="text-sm text-gray-500">89 productos</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-3">
+                                <button class="text-green-600 font-medium hover:text-green-700 transition-colors cursor-pointer whitespace-nowrap">Ver Productos</button>
+                                <i class="ri-arrow-right-line text-green-600 group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta 2 -->
+                    <div class="flex-shrink-0 w-72 bg-white rounded-lg shadow-sm border hover:shadow-md transition-all duration-200 cursor-pointer group">
+                        <div class="relative overflow-hidden rounded-t-lg">
+                            <img alt="Verduras de Hoja" class="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-200" src="https://readdy.ai/api/search-image?query=Fresh%20green%20leafy%20vegetables%20lettuce%20spinach%20kale%20arugula%20arranged%20beautifully%20on%20white%20background%20clean%20modern%20grocery%20display%20natural%20lighting%20healthy%20food%20photography&amp;width=300&amp;height=200&amp;seq=pop2&amp;orientation=landscape">
+                            <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-200"></div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-bold text-gray-900 group-hover:text-green-600 transition-colors">Verduras de Hoja</h3>
+                                <span class="text-sm text-gray-500">67 productos</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-3">
+                                <button class="text-green-600 font-medium hover:text-green-700 transition-colors cursor-pointer whitespace-nowrap">Ver Productos</button>
+                                <i class="ri-arrow-right-line text-green-600 group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta 3 -->
+                    <div class="flex-shrink-0 w-72 bg-white rounded-lg shadow-sm border hover:shadow-md transition-all duration-200 cursor-pointer group">
+                        <div class="relative overflow-hidden rounded-t-lg">
+                            <img alt="Lácteos Premium" class="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-200" src="https://readdy.ai/api/search-image?query=Premium%20dairy%20products%20milk%20bottles%20cheese%20wheels%20yogurt%20containers%20arranged%20elegantly%20on%20white%20background%20clean%20modern%20grocery%20store%20display%20professional%20food%20photography&amp;width=300&amp;height=200&amp;seq=pop3&amp;orientation=landscape">
+                            <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-200"></div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-bold text-gray-900 group-hover:text-green-600 transition-colors">Lácteos Premium</h3>
+                                <span class="text-sm text-gray-500">45 productos</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-3">
+                                <button class="text-green-600 font-medium hover:text-green-700 transition-colors cursor-pointer whitespace-nowrap">Ver Productos</button>
+                                <i class="ri-arrow-right-line text-green-600 group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta 4 -->
+                    <div class="flex-shrink-0 w-72 bg-white rounded-lg shadow-sm border hover:shadow-md transition-all duration-200 cursor-pointer group">
+                        <div class="relative overflow-hidden rounded-t-lg">
+                            <img alt="Carnes Frescas" class="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-200" src="https://readdy.ai/api/search-image?query=Fresh%20quality%20meat%20cuts%20beef%20pork%20chicken%20displayed%20professionally%20on%20white%20background%20clean%20modern%20butcher%20shop%20style%20with%20natural%20lighting%20food%20photography&amp;width=300&amp;height=200&amp;seq=pop4&amp;orientation=landscape">
+                            <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-200"></div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-bold text-gray-900 group-hover:text-green-600 transition-colors">Carnes Frescas</h3>
+                                <span class="text-sm text-gray-500">34 productos</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-3">
+                                <button class="text-green-600 font-medium hover:text-green-700 transition-colors cursor-pointer whitespace-nowrap">Ver Productos</button>
+                                <i class="ri-arrow-right-line text-green-600 group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta 5 -->
+                    <div class="flex-shrink-0 w-72 bg-white rounded-lg shadow-sm border hover:shadow-md transition-all duration-200 cursor-pointer group">
+                        <div class="relative overflow-hidden rounded-t-lg">
+                            <img alt="Bebidas Naturales" class="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-200" src="https://readdy.ai/api/search-image?query=Natural%20fresh%20juices%20and%20beverages%20bottles%20colorful%20fruit%20drinks%20water%20bottles%20arranged%20on%20white%20background%20clean%20modern%20grocery%20display%20healthy%20beverages%20photography&amp;width=300&amp;height=200&amp;seq=pop5&amp;orientation=landscape">
+                            <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-200"></div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-bold text-gray-900 group-hover:text-green-600 transition-colors">Bebidas Naturales</h3>
+                                <span class="text-sm text-gray-500">78 productos</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-3">
+                                <button class="text-green-600 font-medium hover:text-green-700 transition-colors cursor-pointer whitespace-nowrap">Ver Productos</button>
+                                <i class="ri-arrow-right-line text-green-600 group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta 6 -->
+                    <div class="flex-shrink-0 w-72 bg-white rounded-lg shadow-sm border hover:shadow-md transition-all duration-200 cursor-pointer group">
+                        <div class="relative overflow-hidden rounded-t-lg">
+                            <img alt="Pescados del Día" class="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-200" src="https://readdy.ai/api/search-image?query=Fresh%20fish%20and%20seafood%20display%20salmon%20tuna%20shrimp%20arranged%20on%20ice%20white%20background%20clean%20modern%20fish%20market%20style%20professional%20food%20photography&amp;width=300&amp;height=200&amp;seq=pop6&amp;orientation=landscape">
+                            <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-200"></div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-bold text-gray-900 group-hover:text-green-600 transition-colors">Pescados del Día</h3>
+                                <span class="text-sm text-gray-500">23 productos</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-3">
+                                <button class="text-green-600 font-medium hover:text-green-700 transition-colors cursor-pointer whitespace-nowrap">Ver Productos</button>
+                                <i class="ri-arrow-right-line text-green-600 group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-center mt-4 md:hidden">
+                    <div class="flex space-x-2">
+                        <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                        <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                        <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

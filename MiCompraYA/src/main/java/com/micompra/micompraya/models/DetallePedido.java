@@ -93,8 +93,8 @@ public class DetallePedido {
     public String toString() {
         return "DetallePedido{" +
                 "id=" + id +
-                ", pedido=" + pedido +
-                ", producto=" + producto +
+                ", id_pedido=" + (pedido != null ? pedido.getId() : null) + // Solo imprime el ID del pedido
+                ", id_producto=" + (producto != null ? producto.getId() : null) + // Solo imprime el ID del producto
                 ", cantidad=" + cantidad +
                 ", precioUnitario=" + precioUnitario +
                 ", subtotal=" + subtotal +

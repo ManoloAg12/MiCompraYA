@@ -1,0 +1,85 @@
+<div th:fragment="content">
+    <div class="bg-gray-100 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+
+            <header class="mb-10">
+                <h1 class="text-4xl font-bold text-gray-900 tracking-tight">Mensajes Recibidos</h1>
+                <p class="mt-2 text-lg text-gray-600">Bandeja de entrada de mensajes de contacto.</p>
+            </header>
+
+            <div class="space-y-6">
+
+                <div th:if="${#lists.isEmpty(mensajes)}" class="bg-white text-center p-12 rounded-2xl shadow-md border">
+                    <i class="fa-regular fa-envelope-open text-5xl text-gray-300 mb-4"></i>
+                    <h2 class="text-2xl font-semibold text-gray-700">Bandeja de entrada vacía</h2>
+                    <p class="mt-2 text-gray-500">Aún no has recibido ningún mensaje de contacto.</p>
+                </div>
+
+                <div th:unless="${#lists.isEmpty(mensajes)}" th:each="mensaje : ${mensajes}" class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+
+                    <div class="bg-gray-50 p-4 border-b flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <p class="font-semibold text-gray-800" th:text="${mensaje.nombre}">Nombre Remitente</p>
+                            <a th:href="'mailto:' + ${mensaje.correo}" class="text-sm text-blue-600 hover:underline" th:text="${mensaje.correo}">correo@ejemplo.com</a>
+                            <div class="text-sm text-gray-500 mt-1">
+                                <span>Teléfono:</span>
+                                <span th:text="${mensaje.telefono != null ? mensaje.telefono : 'No proporcionado'}">No proporcionado</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button type="button"
+                                    class="reply-button inline-flex items-center gap-2 bg-blue-600 text-white text-sm font-medium py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#responderModal"
+                                    th:attr="data-reply-to=${mensaje.correo}, data-reply-subject='Re: ' + ${mensaje.asunto}, data-mensaje-id=${mensaje.id}">
+                                <i class="fa-solid fa-reply"></i>
+                                Responder
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="p-5">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-2" th:text="${mensaje.asunto}">Asunto del Mensaje</h3>
+                        <p class="text-gray-700 whitespace-pre-wrap" th:text="${mensaje.mensaje}">
+                            Contenido del mensaje...
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="responderModal" tabindex="-1" aria-labelledby="responderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content rounded-xl">
+                <div class="modal-body">
+                    <form id="replyForm" th:action="@{/mensajes/responder}" method="post">
+                        <input type="hidden" id="replyMensajeId" name="mensajeId">
+                        <div class="mb-3">
+                            <label for="replyTo" class="form-label">Para:</label>
+                            <input type="email" class="form-control" id="replyTo" name="to" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="replySubject" class="form-label">Asunto:</label>
+                            <input type="text" class="form-control" id="replySubject" name="subject" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="replyBody" class="form-label">Respuesta:</label>
+                            <textarea class="form-control" id="replyBody" name="body" rows="6" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="replyForm" class="btn btn-primary" id="btnEnviarRespuesta">Enviar Respuesta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100"></div>
+
+</div>

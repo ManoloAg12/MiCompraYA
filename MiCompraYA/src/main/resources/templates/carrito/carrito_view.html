@@ -1,0 +1,138 @@
+    <div th:fragment="content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Encabezado -->
+        <div class="mb-8 flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Mi Carrito</h1>
+                <p class="text-gray-600 mt-1"> productos agregados</p>
+            </div>
+            <a th:href="@{/}" class="text-primary hover:text-green-600 font-medium flex items-center">
+                <i class="ri-arrow-left-line mr-2"></i>
+                Seguir Comprando
+            </a>
+        </div>
+
+        <!-- Layout principal del carrito -->
+        <div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+            <!-- Lista de productos -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-2xl shadow-md border border-gray-200 divide-y divide-gray-200">
+
+                    <!-- Si el carrito está vacío -->
+                    <div id="carritoVacioMensaje" class="p-10 text-center text-gray-500 text-lg"
+                         th:classappend="${!#lists.isEmpty(carrito)} ? 'hidden' : ''">
+                        Tu carrito está vacío 😅
+                    </div>
+
+                    <!-- Lista de productos -->
+                    <div th:each="p, iterStat : ${carrito}"
+                         class="p-8 flex items-center justify-between space-x-6 product-row"
+                         th:attr="data-product=${p.id}, data-precio=${p.precio}, data-stock=${p.stock}">
+
+                        <!-- Imagen -->
+                        <img th:src="${p.urlImagen}" alt="Imagen del producto"
+                             class="w-28 h-28 object-cover rounded-xl border border-gray-100 shadow-sm">
+
+                        <!-- Información -->
+                        <div class="flex-1">
+                            <h3 class="text-xl font-semibold text-gray-900" th:text="${p.nombre}">Nombre</h3>
+                            <p class="text-sm text-gray-500 mt-1" th:text="${p.categoria.categoria}">Categoría</p>
+                            <p class="text-lg font-bold text-indigo-600 mt-2"
+                               th:text="'$' + ${#numbers.formatDecimal(p.precio, 1, 2, 'POINT')}">$0.00</p>
+                        </div>
+
+                        <!-- Controles -->
+                        <div class="flex items-center space-x-6">
+
+                            <!-- Control de cantidad -->
+                            <div class="flex items-center border rounded-xl">
+                                <button class="w-9 h-9 flex items-center justify-center hover:bg-gray-50 rounded-l-xl quantity-btn"
+                                        data-action="decrease" th:attr="data-product=${p.id}">
+                                    <i class="ri-subtract-line text-base text-gray-500"></i>
+                                </button>
+                                <span class="px-4 py-1 font-semibold text-gray-900 quantity-display text-lg"
+                                      th:text="${cantidades[p.id]}" th:attr="data-product=${p.id}"></span>
+                                <button class="w-9 h-9 flex items-center justify-center hover:bg-gray-50 rounded-r-xl quantity-btn"
+                                        data-action="increase" th:attr="data-product=${p.id}">
+                                    <i class="ri-add-line text-base text-gray-500"></i>
+                                </button>
+                            </div>
+
+                            <!-- Subtotal -->
+                            <p class="text-xl font-bold text-gray-900 subtotal min-w-[90px] text-right"
+                               th:attr="data-product=${p.id}"
+                               th:text="'$' + ${#numbers.formatDecimal(p.precio, 1, 2, 'POINT')}">$0.00</p>
+
+                            <!-- Eliminar -->
+                            <button class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-red-500 remove-btn"
+                                    th:attr="data-product=${p.id}">
+                                <i class="ri-close-line text-xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen del pedido -->
+            <div id="resumenPedido" class="bg-white rounded-2xl shadow-md border border-gray-200 p-8 h-fit sticky top-10">
+                <h3 class="text-2xl font-semibold text-gray-900 mb-6">Resumen del pedido</h3>
+
+                <div class="flex justify-between text-gray-700 mb-3">
+                    <span>Subtotal</span>
+                    <span id="totalSubtotal" class="font-medium">$0.00</span>
+                </div>
+
+                <div class="flex justify-between text-gray-700 mb-3">
+                    <span>Envío</span>
+                    <span class="font-medium">Gratis</span>
+                </div>
+
+                <div class="flex justify-between font-bold text-2xl text-gray-900 border-t pt-4 mt-4">
+                    <span>Total</span>
+                    <span id="totalFinal">$0.00</span>
+                </div>
+
+                <!-- Método de pago -->
+                <div class="mt-6">
+                    <label class="block mb-2 font-semibold text-gray-700">Método de pago:</label>
+                    <select id="metodoPago" class="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-green-400">
+                        <option value="" selected disabled>Seleccione un método</option>
+                        <option value="efectivo">Efectivo</option>
+                        <option value="tarjeta">Tarjeta</option>
+                    </select>
+                </div>
+
+                <!-- Mensaje efectivo -->
+                <div id="mensajeEfectivo" class="mt-4 p-4 bg-green-100 text-green-800 rounded-xl hidden">
+                    El pago se realizará al llegar a caja.
+                </div>
+
+                <!-- Formulario tarjeta -->
+                <div id="formTarjeta" class="mt-4 p-4 bg-gray-50 rounded-2xl border border-gray-200 hidden space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-1">Nombre en la tarjeta</label>
+                        <input type="text" id="nombreTarjeta" class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400" placeholder="Juan Perez" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-1">Número de tarjeta</label>
+                        <input type="text" id="numeroTarjeta" maxlength="16" class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400" placeholder="1234 5678 9012 3456" required>
+                    </div>
+                    <div class="flex gap-4 items-end">
+                        <div class="flex-1">
+                            <label class="block text-gray-700 font-semibold mb-1">Fecha de expiración</label>
+                            <input type="text" id="fechaTarjeta" placeholder="MM/AA" maxlength="5" class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400" required>
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-gray-700 font-semibold mb-1">CVV</label>
+                            <input type="text" id="cvvTarjeta" maxlength="3" class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400" placeholder="123" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" id="finalizarBtn" disabled class="w-full mt-8 bg-green-400 text-white py-3 rounded-xl text-lg font-semibold transition disabled:opacity-50">
+                    Finalizar compra
+                </button>
+            </div>
+        </div>
+
+    </div>>

@@ -1,0 +1,106 @@
+<div th:fragment="content">
+  <section class="container mx-auto px-6 py-6">
+    <!-- Migas de pan -->
+    <nav class="text-sm mb-4">
+      <ol class="list-reset flex text-gray-500">
+        <li><a th:href="@{/}" class="hover:text-green-600">Inicio</a></li>
+        <li><span class="mx-2">/</span></li>
+        <li class="text-green-600 font-semibold">Productos</li>
+      </ol>
+    </nav>
+
+    <!-- Título -->
+    <h1 class="text-3xl font-bold mb-2">Todos los Productos</h1>
+    <p class="text-gray-600 mb-6">Encuentra los mejores productos frescos y de calidad para tu hogar</p>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <!-- Filtros -->
+      <aside class="bg-white shadow rounded-lg p-5">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold">Filtros</h2>
+          <a href="#" class="text-green-600 text-sm hover:underline">Limpiar Todo</a>
+        </div>
+
+        <!-- Buscar -->
+        <div class="mb-5">
+          <input type="text" placeholder="Buscar productos..."
+                 class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring focus:ring-green-300">
+        </div>
+
+        <!-- Categorías -->
+        <div class="mb-5">
+          <h3 class="text-md font-semibold mb-2">Categorías</h3>
+          <ul class="space-y-2 text-sm">
+            <li><label><input type="radio" name="cat" checked> Todas las Categorías (1081)</label></li>
+            <li><label><input type="radio" name="cat"> Lácteos (127)</label></li>
+            <li><label><input type="radio" name="cat"> Frutas (203)</label></li>
+            <li><label><input type="radio" name="cat"> Vegetales (185)</label></li>
+            <li><label><input type="radio" name="cat"> Abarrotes (312)</label></li>
+            <li><label><input type="radio" name="cat"> Bebidas (156)</label></li>
+            <li><label><input type="radio" name="cat"> Carnes y Pescados (98)</label></li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Productos -->
+      <div class="lg:col-span-3">
+        <!-- Barra superior -->
+        <div class="flex justify-between items-center mb-5">
+          <p class="text-sm text-gray-600">Mostrando <span class="font-semibold">1,081</span> productos</p>
+          <div class="flex items-center space-x-3">
+            <label class="text-sm">Ordenar por:</label>
+            <select class="border rounded-lg px-2 py-1 text-sm focus:ring focus:ring-green-300">
+              <option>Nombre A-Z</option>
+              <option>Nombre Z-A</option>
+              <option>Precio Menor-Mayor</option>
+              <option>Precio Mayor-Menor</option>
+            </select>
+            <button class="p-2 border rounded-lg hover:bg-gray-100">
+              <i class="fa-solid fa-table-cells"></i>
+            </button>
+            <button class="p-2 border rounded-lg hover:bg-gray-100">
+              <i class="fa-solid fa-list"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista de productos -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6  ">
+          <div th:each="p : ${productos}"
+               class="bg-white border rounded-lg shadow hover:shadow-lg transform transition-transform duration-300 hover:scale-105 relative">
+
+            <!-- Botón de favorito (solo visual) -->
+            <button class="absolute top-2 right-2 text-gray-400 hover:text-red-500">
+              <i class="fa-regular fa-heart"></i>
+            </button>
+
+            <!-- Imagen del producto -->
+            <img th:src="${p.urlImagen}" alt="Imagen del producto"
+                 class="w-full h-48 object-contain p-4">
+
+            <div class="p-4">
+              <!-- Categoría -->
+              <h3 class="text-sm text-gray-500" th:text="${p.categoria.categoria}">Categoría</h3>
+
+              <!-- Nombre -->
+              <p class="font-semibold" th:text="${p.nombre}">Nombre del producto</p>
+
+              <!-- Precio -->
+              <p class="text-green-600 font-bold mt-2"
+                 th:text="'$' + ${#numbers.formatDecimal(p.precio, 1, 2, 'POINT')}"></p>
+
+              <!-- Botón Agregar al carrito -->
+              <!-- Botón Agregar al carrito -->
+              <button type="button"
+                      class="agregar-carrito mt-3 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"
+                      th:attr="data-idproducto=${p.id}, data-stock=${p.stock}">
+                <i class="fa-solid fa-cart-plus"></i> Agregar al carrito
+              </button>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

@@ -41,6 +41,14 @@ public class Producto {
     @JoinColumn(name = "estado_producto", nullable = false)
     private EstadoProducto estadoProducto;
 
+    @Column(name = "url_imagen", nullable = false)
+    private String urlImagen;
+
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "marca", nullable = false)
+    private Marca marca;
+
+
     public Integer getId() {
         return id;
     }
@@ -113,10 +121,23 @@ public class Producto {
         this.estadoProducto = estadoProducto;
     }
 
+    public String getUrlImagen() {
+        return urlImagen;
+    }
+
+    public void setUrlImagen(String urlImagen) {
+        this.urlImagen = urlImagen;
+    }
+    public Marca getMarca(){
+        return marca;}
+
+    public void setMarca(Marca marca){
+        this.marca = marca;}
+
     public Producto() {
     }
 
-    public Producto(Integer id, String nombre, String descripcion, BigDecimal precio, Integer stock, Categoria categoria, LocalDate fechaAgregado, LocalDate caducidad, EstadoProducto estadoProducto) {
+    public Producto(Integer id, String nombre, String descripcion, BigDecimal precio, Integer stock, Categoria categoria, LocalDate fechaAgregado, LocalDate caducidad, EstadoProducto estadoProducto, String urlImagen, Marca marca) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -126,6 +147,8 @@ public class Producto {
         this.fechaAgregado = fechaAgregado;
         this.caducidad = caducidad;
         this.estadoProducto = estadoProducto;
+        this.urlImagen = urlImagen;
+        this.marca = marca;
     }
 
     @Override
@@ -140,6 +163,8 @@ public class Producto {
                 ", fechaAgregado=" + fechaAgregado +
                 ", caducidad=" + caducidad +
                 ", estadoProducto=" + estadoProducto +
+                ", urlImagen='" + urlImagen + '\'' +
+                ", marca=" + marca +
                 '}';
     }
 }

@@ -1,0 +1,304 @@
+<div th:fragment="content">
+
+    <div class="container mx-auto px-4 py-6">
+        <nav class="flex items-center space-x-2 text-sm text-gray-600 mb-6">
+            <a th:href="@{/}" class="hover:text-green-600 transition-colors cursor-pointer"
+               href="/preview/67f5d78d-75f8-4e4c-a957-ae88a640be6c/2653746"
+               data-discover="true">Inicio</a>
+            <i class="ri-arrow-right-s-line text-gray-400"></i>
+            <span class="text-green-600 font-medium">Agregar Producto</span>
+        </nav>
+
+        <div class="flex justify-end space-x-3 mb-6">
+
+            <!-- Botón Nueva Marca -->
+            <button type="button"
+                    class="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl
+                   hover:bg-green-50 hover:border-green-400 hover:text-green-700 transition-all shadow-sm"
+                    onclick="document.getElementById('modalMarca').showModal()">
+                <i class="ri-price-tag-3-line text-green-600"></i>
+                <span class="font-medium">Nueva Marca</span>
+            </button>
+
+            <!-- Botón Nueva Categoría -->
+            <button type="button"
+                    class="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl
+                   hover:bg-blue-50 hover:border-blue-400 hover:text-blue-700 transition-all shadow-sm"
+                    onclick="document.getElementById('modalCategoria').showModal()">
+                <i class="ri-folder-add-line text-blue-600"></i>
+                <span class="font-medium">Nueva Categoría</span>
+            </button>
+
+            <!-- Botón Nuevo Estado -->
+            <button type="button"
+                    class="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl
+                   hover:bg-yellow-50 hover:border-yellow-400 hover:text-yellow-700 transition-all shadow-sm"
+                    onclick="document.getElementById('modalEstado').showModal()">
+                <i class="ri-checkbox-circle-line text-yellow-600"></i>
+                <span class="font-medium">Nuevo Estado</span>
+            </button>
+
+        </div>
+
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-lg shadow-sm p-8">
+
+
+                <div class="mb-8">
+                    <h1 class="text-2xl font-bold text-gray-900 mb-2">Agregar Nuevo Producto</h1>
+                    <p class="text-gray-600">Completa la información del producto para agregarlo al catálogo</p>
+                </div>
+
+
+                <form class="space-y-8" th:object="${producto}" th:action="@{/productos/guardar}" method="post" enctype="multipart/form-data">
+                    <!-- Información Básica -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="lg:col-span-2">
+                            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <i class="ri-information-line mr-2 text-green-600"></i>Información Básica
+                            </h2>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre del Producto *</label>
+                            <input class="w-full px-4 py-3 border border-gray-300 rounded-lg
+                                          focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                                   placeholder="Ej: Leche Entera Orgánica 1L" required type="text" name="nombre">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Marca *</label>
+                            <select name="marca"
+                                    class="w-full px-4 py-3 pr-8 border border-gray-300 rounded-lg
+                                               focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm
+                                               cursor-pointer appearance-none" required th:field="*{marca}">
+                                <option value="">Seleccione una marca</option>
+                                <option th:each="marca : ${marcas}" th:value="${marca.id}" th:text="${marca.nombreMarca}"></option>
+
+                            </select>
+                        </div>
+                        <div class="lg:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Descripción *</label>
+                            <textarea name="descripcion" rows="4"
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg
+                                             focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm resize-none"
+                                      placeholder="Describe las características, beneficios y detalles del producto..."
+                                      maxlength="500" required></textarea>
+                            <div class="mt-1 text-xs text-gray-500 text-right">0/500 caracteres</div>
+                        </div>
+                    </div>
+
+                    <!-- Información Comercial -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-3">
+                            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <i class="ri-price-tag-3-line mr-2 text-green-600"></i>Información Comercial
+                            </h2>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Precio *</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 text-sm">$</span>
+                                </div>
+                                <input step="0.01" min="0"
+                                       class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg
+                                              focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                                       placeholder="0.00" required type="number" name="precio">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Stock *</label>
+                            <input min="0"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg
+                                          focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                                   placeholder="0" required type="number" name="stock">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Estado del Producto *</label>
+                            <div class="relative">
+                                <select
+                                        class="w-full px-4 py-3 pr-8 border border-gray-300 rounded-lg
+                                               focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm
+                                               cursor-pointer appearance-none" required th:field="*{estadoProducto}">
+                                    <option value="">Seleccione un estado</option>
+                                    <option th:each="e : ${estados}"
+                                            th:value="${e.id}"
+                                            th:text="${e.estadoProducto     }">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clasificación -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="lg:col-span-2">
+                            <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <i class="ri-folder-line mr-2 text-green-600"></i>Clasificación
+                            </h2>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Categoría *</label>
+                            <div class="relative">
+                                <select
+                                        class="w-full px-4 py-3 pr-8 border border-gray-300 rounded-lg
+                                               focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm
+                                               cursor-pointer appearance-none" required th:field="*{categoria}">
+                                    <option value="">Seleccione una categoría</option>
+                                    <option th:each="categoria : ${categorias}"
+                                            th:value="${categoria.id}"
+                                            th:text="${categoria.categoria}">
+                                    </option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                    <i class="ri-arrow-down-s-line text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Caducidad</label>
+                            <input class="w-full px-4 py-3 border border-gray-300 rounded-lg
+                                          focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                                   type="date" name="caducidad">
+                        </div>
+                    </div>
+
+                    <!-- Imagen -->
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                            <i class="ri-image-line mr-2 text-green-600"></i>Imagen del Producto
+                        </h2>
+                        <div class="space-y-4">
+                            <input accept="image/*" class="hidden" type="file" name="imagen">
+                            <div class="border-2 border-dashed rounded-lg p-8 text-center transition-colors
+                                        cursor-pointer border-gray-300 hover:border-green-400 hover:bg-gray-50">
+                                <div class="flex flex-col items-center space-y-4">
+                                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                                        <i class="ri-image-add-line text-2xl text-gray-400"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-lg font-medium text-gray-900 mb-2">Subir imagen del producto</p>
+                                        <p class="text-sm text-gray-600 mb-4">
+                                            Arrastra y suelta una imagen aquí, o haz clic para seleccionar
+                                        </p>
+                                        <div class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg
+                                                    hover:bg-green-700 transition-colors cursor-pointer whitespace-nowrap">
+                                            <i class="ri-upload-2-line mr-2"></i>Seleccionar Imagen
+                                        </div>
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        Formatos soportados: JPG, PNG, GIF (máx. 5MB)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                <p class="mb-2"><strong>Recomendaciones para la imagen:</strong></p>
+                                <ul class="space-y-1 text-xs">
+                                    <li>• Usa una imagen de alta calidad y bien iluminada</li>
+                                    <li>• Preferible fondo blanco o neutro</li>
+                                    <li>• Resolución mínima recomendada: 800x800 píxeles</li>
+                                    <li>• El producto debe ocupar la mayor parte de la imagen</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+                        <button type="button"
+                                class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700
+                                       hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap">
+                            <i class="ri-refresh-line mr-2"></i>Limpiar Formulario
+                        </button>
+                        <button type="submit"
+                                class="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700
+                                       disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors
+                                       cursor-pointer whitespace-nowrap flex items-center">
+                            <i class="ri-add-line mr-2"></i>Agregar Producto
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar Marca -->
+    <dialog id="modalMarca" class="rounded-lg shadow-lg w-96">
+        <form method="post" th:action="@{/marcas/guardar}" class="p-6 space-y-4">
+            <h3 class="text-lg font-semibold text-gray-900">Agregar Nueva Marca</h3>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de la Marca *</label>
+                <input type="text" name="nombreMarca"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                       placeholder="Ej: Coca-Cola" required>
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-2">
+                <button type="button"
+                        onclick="document.getElementById('modalMarca').close()"
+                        class="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Modal para agregar Categoría -->
+    <dialog id="modalCategoria" class="rounded-lg shadow-lg w-96">
+        <form method="post" th:action="@{/categorias/guardar}" class="p-6 space-y-4">
+            <h3 class="text-lg font-semibold text-gray-900">Agregar Nueva Categoría</h3>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de la Categoría *</label>
+                <input type="text" name="categoria"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                       placeholder="Ej: Lácteos, Abarrotes..." required>
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-2">
+                <button type="button"
+                        onclick="document.getElementById('modalCategoria').close()"
+                        class="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Modal para agregar Estado de Producto -->
+    <dialog id="modalEstado" class="rounded-lg shadow-lg w-96">
+        <form method="post" th:action="@{/estados/guardar}" class="p-6 space-y-4">
+            <h3 class="text-lg font-semibold text-gray-900">Agregar Nuevo Estado</h3>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Estado *</label>
+                <input type="text" name="estadoProducto"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
+                       placeholder="Ej: Disponible, Agotado, Descontinuado..." required>
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-2">
+                <button type="button"
+                        onclick="document.getElementById('modalEstado').close()"
+                        class="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+
+</div>

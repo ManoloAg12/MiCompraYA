@@ -13,8 +13,8 @@ public class Usuario {
     @Column(name = "id_usuario", nullable = false)
     private Integer id;
 
-    @Column(name = "usuario", nullable = false, length = 100)
-    private String usuario;
+    @Column(name = "nombre_usuario", nullable = false, length = 100)
+    private String nombreUsuario;
 
     @Column(name = "correo", nullable = false, length = 150)
     private String correo;
@@ -34,6 +34,8 @@ public class Usuario {
     @JoinColumn(name = "id_estado", nullable = false)
     private Estado estado;
 
+
+
     public Integer getId() {
         return id;
     }
@@ -42,12 +44,12 @@ public class Usuario {
         this.id = id;
     }
 
-    public String getUsuario() {
-        return usuario;
+    public String getNombreUsuario() {
+        return nombreUsuario;
     }
 
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
     }
 
     public String getCorreo() {
@@ -93,9 +95,9 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(Integer id, String usuario, String correo, String contrasena, Rol rol, LocalDate fechaRegistro, Estado estado) {
+    public Usuario(Integer id, String nombre_usuario, String correo, String contrasena, Rol rol, LocalDate fechaRegistro, Estado estado) {
         this.id = id;
-        this.usuario = usuario;
+        this.nombreUsuario = nombre_usuario;
         this.correo = correo;
         this.contrasena = contrasena;
         this.rol = rol;
@@ -107,7 +109,7 @@ public class Usuario {
     public String toString() {
         return "Usuario{" +
                 "id=" + id +
-                ", usuario='" + usuario + '\'' +
+                ", nombreUsuario='" + nombreUsuario + '\'' +
                 ", correo='" + correo + '\'' +
                 ", contrasena='" + contrasena + '\'' +
                 ", rol=" + rol +

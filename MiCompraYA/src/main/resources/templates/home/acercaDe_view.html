@@ -1,0 +1,99 @@
+<div th:fragment="content">
+    <!-- Hero Section -->
+    <section class="relative py-20 bg-gradient-to-r from-primary to-teal-600 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="font-['Playfair_Display'] text-4xl md:text-5xl font-bold mb-6">Sobre Mí</h1>
+                <p class="font-['Inter'] text-xl max-w-3xl mx-auto">
+                    Soy un estudiante de cuarto año en el área de programación, apasionado por la tecnología, el aprendizaje constante y el desarrollo de soluciones que transformen ideas en proyectos reales.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mi Historia -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="font-['Playfair_Display'] text-3xl font-bold text-gray-900 mb-6">Mi Trayectoria</h2>
+                    <p class="font-['Inter'] text-gray-600 mb-6">
+                        Durante mis años de estudio he adquirido experiencia en el desarrollo de aplicaciones web, móviles y de escritorio, trabajando con tecnologías modernas y aplicando buenas prácticas de programación.
+                    </p>
+                    <p class="font-['Inter'] text-gray-600 mb-6">
+                        Me caracterizo por mi compromiso, capacidad de adaptación y mi interés en seguir aprendiendo sobre ciberseguridad, inteligencia artificial y desarrollo de software, áreas que considero fundamentales en la actualidad.
+                    </p>
+                    <div class="bg-gray-50 p-6 rounded-lg border-l-4 border-secondary">
+                        <p class="font-['Inter'] italic text-gray-700">
+                            "Mi objetivo es crecer como profesional en el mundo de la tecnología, aportar soluciones innovadoras y ser parte de proyectos que generen impacto positivo."
+                        </p>
+                    </div>
+                </div>
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                         alt="Programación" class="rounded-2xl shadow-xl w-full h-96 object-cover">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mis Valores -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="font-['Playfair_Display'] text-3xl font-bold text-gray-900 mb-4">Mis Valores</h2>
+                <p class="font-['Inter'] text-lg text-gray-600 max-w-2xl mx-auto">Los principios que me guían en mi formación y en cada proyecto en el que participo.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm text-center hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <i class="ri-code-s-slash-line text-3xl text-blue-600"></i>
+                    </div>
+                    <h3 class="font-['Montserrat'] font-semibold text-gray-900 mb-3">Pasión por Programar</h3>
+                    <p class="font-['Inter'] text-gray-600 text-sm">Disfruto transformar ideas en código funcional y eficiente.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm text-center hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-xl flex items-center justify-center">
+                        <i class="ri-lightbulb-flash-line text-3xl text-green-600"></i>
+                    </div>
+                    <h3 class="font-['Montserrat'] font-semibold text-gray-900 mb-3">Innovación</h3>
+                    <p class="font-['Inter'] text-gray-600 text-sm">Busco siempre nuevas formas de resolver problemas de manera creativa.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm text-center hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-orange-100 rounded-xl flex items-center justify-center">
+                        <i class="ri-team-line text-3xl text-orange-600"></i>
+                    </div>
+                    <h3 class="font-['Montserrat'] font-semibold text-gray-900 mb-3">Trabajo en Equipo</h3>
+                    <p class="font-['Inter'] text-gray-600 text-sm">Creo que los mejores proyectos nacen de la colaboración y la comunicación.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm text-center hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-purple-100 rounded-xl flex items-center justify-center">
+                        <i class="ri-book-line text-3xl text-purple-600"></i>
+                    </div>
+                    <h3 class="font-['Montserrat'] font-semibold text-gray-900 mb-3">Aprendizaje Constante</h3>
+                    <p class="font-['Inter'] text-gray-600 text-sm">Me esfuerzo por mantenerme actualizado en tecnologías emergentes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-primary text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="font-['Playfair_Display'] text-3xl font-bold mb-6">¿Listo para trabajar juntos?</h2>
+            <p class="font-['Inter'] text-xl mb-8 max-w-2xl mx-auto">Estoy en busca de oportunidades para aplicar mis conocimientos, crecer como profesional y aportar soluciones reales en el mundo del desarrollo de software.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a th:href="@{/portafolio}" class="!rounded-button whitespace-nowrap bg-secondary hover:bg-opacity-90 text-white px-8 py-4 font-semibold transition-all duration-300 hover:scale-105">
+                    Ver Mi Portafolio
+                </a>
+                <a th:href="@{/contacto}" class="!rounded-button whitespace-nowrap border-2 border-white text-white hover:bg-white hover:text-primary px-8 py-4 font-semibold transition-all duration-300">
+                    Contáctame
+                </a>
+            </div>
+        </div>
+    </section>
+</div>

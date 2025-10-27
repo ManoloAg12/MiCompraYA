@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiCompraYa - Supermercado Premium Online</title>
+    <link rel="icon" type="image/png" href="/images/canasta.png">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2A4858',
+                        secondary: '#FF7F6B'
+                    },
+                    borderRadius: {
+                        'none': '0px',
+                        'sm': '4px',
+                        DEFAULT: '8px',
+                        'md': '12px',
+                        'lg': '16px',
+                        'xl': '20px',
+                        '2xl': '24px',
+                        '3xl': '32px',
+                        'full': '9999px',
+                        'button': '8px'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Fuentes e iconos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" >
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v7.0.1/css/all.css">
+
+    <style>
+        /* Estilos personalizados */
+        .hero-bg {
+            background-image: linear-gradient(135deg, rgba(42, 72, 88, 0.4) 0%, rgba(127, 169, 155, 0.3) 100%), url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .category-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .category-hover:hover {
+            transform: translateY(-0.5rem) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .scroll-indicator {
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 53%, 80%, 100% {
+                transform: translate3d(0,0,0);
+            }
+            40%, 43% {
+                transform: translate3d(0,-1rem,0);
+            }
+            70% {
+                transform: translate3d(0,-0.5rem,0);
+            }
+            90% {
+                transform: translate3d(0,-0.25rem,0);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(2rem);
+            transition: all 0.8s ease-out;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class=" bg-gray-50 text-gray-800" >
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-20">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 flex items-center justify-center bg-green-400 text-white rounded-lg">
+                    <i class="ri-shopping-basket-line text-xl"></i>
+                </div>
+                <span class="font-['Pacifico'] text-2xl text-green-600">MiCompraYa</span>
+            </div>
+
+            <nav class="hidden md:flex items-center space-x-8">
+                <a th:href="@{/}" class="relative font-medium text-gray-600 hover:text-green-500 transition-colors duration-300 group">
+                    Inicio
+                    <span class="absolute left-0 -bottom-1 w-0 h-1 bg-green-500 transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a th:href="@{/categorias}" class="relative font-medium text-gray-600 hover:text-green-500 transition-colors duration-300 group">
+                    Categorías
+                    <span class="absolute left-0 -bottom-1 w-0 h-1 bg-green-500 transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a th:href="@{/producto}" class="relative font-medium text-gray-600 hover:text-green-500 transition-colors duration-300 group">
+                    Productos
+                    <span class="absolute left-0 -bottom-1 w-0 h-1 bg-green-500 transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a th:href="@{/acercaDe}" class="relative font-medium text-gray-600 hover:text-green-500 transition-colors duration-300 group">
+                    Sobre Nosotros
+                    <span class="absolute left-0 -bottom-1 w-0 h-1 bg-green-500 transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a th:href="@{/contactenos}" class="relative font-medium text-gray-600 hover:text-green-500 transition-colors duration-300 group">
+                    Contáctenos
+                    <span class="absolute left-0 -bottom-1 w-0 h-1 bg-green-500 transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a th:href="@{/mensajes_view}" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-green-500 transition-colors duration-200">Mensajes</a>
+
+                <div class="relative inline-block text-left">
+                    <button id="btnMantenimiento"
+                            class="relative flex items-center gap-2 font-medium text-gray-600 hover:text-green-500 transition-colors duration-300 group">
+                        <i class="fa-solid fa-gear"></i>
+                        Mantenimiento
+                        <svg class="w-4 h-4 ml-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M19 9l-7 7-7-7" />
+                        </svg>
+                        <span class="absolute left-0 -bottom-1 w-0 h-1 bg-green-500 transition-all duration-300 group-hover:w-full"></span>
+                    </button>
+
+                    <div id="menuMantenimiento" class="absolute hidden bg-white shadow-lg rounded-md mt-2 w-40 z-50" th:if="${session.usuario != null}">
+                        <a th:href="@{/usuarios}" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-green-500 transition-colors duration-200">Usuario</a>
+                        <a th:href="@{/agregarProducto}" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-green-500 transition-colors duration-200">Agregar Producto</a>
+
+                    </div>
+                </div>
+            </nav>
+            <div class="flex items-center space-x-4">
+
+                <!-- Carrito de compras -->
+                <a th:href="@{/carrito}"
+                   class="relative p-2 text-gray-600 hover:text-primary transition-colors duration-300">
+                    <div class="w-6 h-6 flex items-center justify-center">
+                        <i class="ri-shopping-cart-line text-xl"></i>
+                    </div>
+                    <!-- Badge de cantidad -->
+                    <span id="cart-count"
+                          class="absolute -top-1 -right-1 bg-green-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+                          style="display:none;">
+                    </span>
+                </a>
+
+                <!-- Icono de usuario para login -->
+                <div class="relative inline-block text-left">
+                    <!-- Botón de usuario -->
+                    <button onclick="toggleMenu()" class="p-2 rounded-full hover:bg-gray-100 transition">
+                        <i class="fa-regular fa-user text-xl text-gray-700"></i>
+                    </button>
+
+                    <!-- Menú emergente -->
+                    <div id="userMenu" class="hidden absolute right-0 mt-2 w-80 bg-white shadow-lg rounded-2xl border border-gray-200 z-50">
+                        <!-- Si NO hay sesión -->
+                        <div th:if="${session.usuario == null}" class="p-4 text-center">
+                            <i class="fa-regular fa-circle-user text-4xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-700 font-semibold">¡Bienvenido!</p>
+                            <p class="text-sm text-gray-500 mb-3">Inicia sesión para continuar</p>
+                            <a href="/login" class="inline-block bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">Iniciar sesión</a>
+                        </div>
+
+                        <!-- Si hay sesión iniciada -->
+                        <div th:if="${session.usuario != null}" class="p-4">
+                            <div class="flex items-center mb-3">
+                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
+                                    <i class="fa-regular fa-user text-xl"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-gray-800 font-semibold" th:text="${session.usuario?.nombreUsuario}">Usuario</p>
+                                    <p class="text-sm text-gray-500" th:text="${session.usuario?.correo}">usuario@correo.com</p>
+                                </div>
+                            </div>
+                            <hr class="my-2">
+                            <a href="/pedido/pedidos_view" class="block text-gray-700 hover:text-blue-600 py-2 text-sm w-full text-left">Mis pedidos</a>
+                            <button onclick="toggleModal('modalCambiarContrasena')"
+                                    class="block text-gray-700 hover:text-blue-600 py-2 text-sm w-full text-left">
+                                Cambiar contraseña
+                            </button>
+                            <a href="/logout" class="block text-red-600 font-medium hover:underline py-2 text-sm">Cerrar sesión</a>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="md:hidden p-2 text-gray-600">
+                    <div class="w-6 h-6 flex items-center justify-center">
+                        <i class="ri-menu-line text-xl"></i>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main>
+    <!-- Aquí se insertará el contenido específico de cada página -->
+    <div th:replace="~{${view} :: content}"></div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div>
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-10 h-10 flex items-center justify-center bg-secondary text-white rounded-lg">
+                        <i class="ri-shopping-basket-line text-xl"></i>
+                    </div>
+                    <span class="font-['Pacifico'] text-2xl">MiCompraYa</span>
+                </div>
+                <p class="font-['Inter'] text-gray-300 mb-6 leading-relaxed">
+                    Tu socio de confianza para productos de calidad premium entregados frescos en tu puerta. Experimenta la conveniencia de las compras online con la garantía de calidad.
+                </p>
+                <div class="space-y-2">
+                    <p class="font-['Inter'] text-gray-300">
+                        <span class="font-semibold">Teléfono:</span> (555) 123-4567
+                    </p>
+                    <p class="font-['Inter'] text-gray-300">
+                        <span class="font-semibold">Email:</span> hola@micompraya.com
+                    </p>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="font-['Montserrat'] font-semibold text-lg mb-6">Enlaces Rápidos</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-3">
+                        <a href="#" class="font-['Inter'] text-gray-300 hover:text-secondary transition-colors duration-300 block">Sobre Nosotros</a>
+                        <a href="#" class="font-['Inter'] text-gray-300 hover:text-secondary transition-colors duration-300 block">Categorías</a>
+                        <a href="#" class="font-['Inter'] text-gray-300 hover:text-secondary transition-colors duration-300 block">Ofertas Especiales</a>
+                        <a href="#" class="font-['Inter'] text-gray-300 hover:text-secondary transition-colors duration-300 block">Información de Entrega</a>
+                    </div>
+                    <div class="space-y-3">
+                        <a href="#" class="font-['Inter'] text-gray-300 hover:text-secondary transition-colors duration-300 block">Contactenos</a>
+                        <a href="#" class="font-['Inter'] text-gray-300 hover:text-secondary transition-colors duration-300 block">Preguntas Frecuentes</a>
+                        <a href="#" class="font-['Inter'] text-gray-300 hover:text-secondary transition-colors duration-300 block">Política de Privacidad</a>
+                        <a href="#" class="font-['Inter'] text-gray-300 hover:text-secondary transition-colors duration-300 block">Términos de Servicio</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div>
+                <h3 class="font-['Montserrat'] font-semibold text-lg mb-6">Síguenos</h3>
+                <div class="flex space-x-4 mb-8">
+                    <a href="#" class="w-12 h-12 flex items-center justify-center bg-gray-800 rounded-lg hover:bg-secondary transition-colors duration-300">
+                        <i class="ri-facebook-fill text-xl"></i>
+                    </a>
+                    <a href="#" class="w-12 h-12 flex items-center justify-center bg-gray-800 rounded-lg hover:bg-secondary transition-colors duration-300">
+                        <i class="ri-twitter-fill text-xl"></i>
+                    </a>
+                    <a href="#" class="w-12 h-12 flex items-center justify-center bg-gray-800 rounded-lg hover:bg-secondary transition-colors duration-300">
+                        <i class="ri-instagram-fill text-xl"></i>
+                    </a>
+                    <a href="#" class="w-12 h-12 flex items-center justify-center bg-gray-800 rounded-lg hover:bg-secondary transition-colors duration-300">
+                        <i class="ri-youtube-fill text-xl"></i>
+                    </a>
+                </div>
+
+                <div>
+                    <h4 class="font-['Montserrat'] font-semibold mb-4">Aceptamos</h4>
+                    <div class="flex space-x-3">
+                        <div class="w-12 h-8 flex items-center justify-center bg-white rounded text-gray-800">
+                            <i class="ri-visa-fill text-lg"></i>
+                        </div>
+                        <div class="w-12 h-8 flex items-center justify-center bg-white rounded text-gray-800">
+                            <i class="ri-mastercard-fill text-lg"></i>
+                        </div>
+                        <div class="w-12 h-8 flex items-center justify-center bg-white rounded text-gray-800">
+                            <i class="ri-paypal-fill text-lg"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-800 mt-12 pt-8 text-center">
+            <p class="font-['Inter'] text-gray-400">
+                © 2025 MiCompraYa. Todos los derechos reservados. | Entregando frescura desde 2020
+            </p>
+        </div>
+    </div>
+</footer>
+
+
+<!-- toast universal -->
+<div id="toast-container" class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 11; display: none;width: 40%;"></div>
+<input type="hidden" id="tipo-toast" th:value="${tipo}">
+<input type="hidden" id="mensaje-toast" th:value="${mensaje}">
+
+
+<!-- Modal Cambiar Contraseña -->
+<div id="modalCambiarContrasena" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative transform transition-all scale-100">
+        <h2 class="text-xl font-semibold text-gray-800 mb-5 text-center flex items-center justify-center gap-2">
+            <i class="fa-solid fa-lock text-blue-600"></i> Cambiar Contraseña
+        </h2>
+
+        <form id="formCambiarContrasena" method="post" th:action="@{/cambiarContrasena}" novalidate>
+
+            <input type="hidden" name="idUsuario" id="idUsuario" th:value="${session.usuario?.id}">
+            <!-- Nueva contraseña -->
+            <div class="mb-4 relative">
+                <label for="nueva" class="block text-sm font-medium text-gray-700 mb-1">Nueva contraseña</label>
+                <div class="relative">
+                    <i class="fa-solid fa-lock absolute left-3 top-3 text-gray-400"></i>
+                    <input type="password" id="nueva" name="nueva" required minlength="8"
+                           class="w-full border border-gray-300 rounded-md pl-10 pr-10 py-2 focus:ring focus:ring-blue-300">
+                    <i class="fa-regular fa-eye absolute right-3 top-3 text-gray-500 cursor-pointer toggle-pass" data-target="nueva"></i>
+                </div>
+                <small id="seguridad" class="text-xs text-gray-500 mt-1 block">Debe tener al menos 8 caracteres</small>
+            </div>
+
+            <!-- Confirmar contraseña -->
+            <div class="mb-5 relative">
+                <label for="confirmar" class="block text-sm font-medium text-gray-700 mb-1">Confirmar nueva contraseña</label>
+                <div class="relative">
+                    <i class="fa-solid fa-lock absolute left-3 top-3 text-gray-400"></i>
+                    <input type="password" id="confirmar" name="confirmar" required
+                           class="w-full border border-gray-300 rounded-md pl-10 pr-10 py-2 focus:ring focus:ring-blue-300">
+                    <i class="fa-regular fa-eye absolute right-3 top-3 text-gray-500 cursor-pointer toggle-pass" data-target="confirmar"></i>
+                </div>
+                <small id="coincidencia" class="text-xs text-gray-500 mt-1 block"></small>
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="toggleModal('modalCambiarContrasena')"
+                        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition">
+                    Cancelar
+                </button>
+                <button type="submit" id="btnGuardar"
+                        class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green -700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled>
+                    Guardar
+                </button>
+            </div>
+        </form>
+
+        <!-- Botón cerrar (X) -->
+        <button onclick="toggleModal('modalCambiarContrasena')"
+                class="absolute top-3 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold">
+            &times;
+        </button>
+    </div>
+</div>
+
+
+<!-- Scripts de funcionalidad -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+<script th:src="@{/js/datatable.js}"></script>
+<script th:src="@{/js/usuarios.js}"></script>
+<script th:src="@{/js/layaout.js}"></script>
+<script th:src="@{/js/toast.js}"></script>
+<script th:src="@{/js/cambiarContrasenaM.js}"></script>
+<script th:src="@{/js/agProductosJS.js}"></script>
+<script th:src="@{/js/carrito.js}"></script>
+<script th:src="@{/js/carritoBadge.js}"></script>
+<script th:src="@{/js/pedido.js}"></script>
+<script th:src="@{/js/contactanosJS.js}"></script>
+
+
+
+</body>
+</html>
