@@ -1,13 +1,16 @@
 package com.micompra.micompraya.controllers;
 
+import com.micompra.micompraya.models.Producto;
 import com.micompra.micompraya.services.CarritoService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import com.micompra.micompraya.services.ProductoService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -17,10 +20,14 @@ public class HomeController {
 
     // ✅ Solo necesitamos el servicio del carrito aquí para las operaciones del carrito
     private final CarritoService carritoService;
+    private final ProductoService productoService;
 
     // --- MÉTODOS DE NAVEGACIÓN (SIN CAMBIOS) ---
     @GetMapping({"/", "/home"})
     public String home(Model model) {
+        // Obtenemos los 4 productos con más stock desde el servicio
+        List<Producto> productosDestacados = productoService.obtenerProductosConMasStock(4);
+        model.addAttribute("productosDestacados", productosDestacados);
         model.addAttribute("view", "home/home_view");
         return "layout/layout";
     }
@@ -39,7 +46,11 @@ public class HomeController {
 
     @GetMapping("/accesoNegado")
     public String accesoNegado(Model model) {
-        return "home/accesoNegado_view";
+        // 1. Añade el nombre del fragmento al modelo
+        model.addAttribute("view", "home/accesoNegado_view");
+
+        // 2. Devuelve la plantilla principal (layout)
+        return "layout/layout";
     }
 
     // --- MÉTODOS DEL CARRITO (AHORA SIMPLIFICADOS) ---
@@ -88,4 +99,6 @@ public class HomeController {
         carritoService.actualizarCantidad(id, cantidad, session);
         return "ok";
     }
+
+
 }

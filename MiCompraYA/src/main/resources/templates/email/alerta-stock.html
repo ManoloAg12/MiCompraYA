@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: sans-serif; color: #333; background-color: #f4f4f7; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; border: 1px solid #ddd; }
+    .header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid; }
+    .header.warning { border-color: #ffc107; color: #d39e00; } /* Amarillo para advertencia */
+    .header.danger { border-color: #dc3545; color: #dc3545; } /* Rojo para agotado */
+    .content { padding: 20px 0; }
+    .product-info { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 10px; }
+    .label { font-weight: bold; color: #555; }
+    .value { font-size: 1.1em; color: #000; }
+    .stock-big { font-size: 24px; font-weight: bold; display: block; margin-top: 5px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header" th:classappend="${stock == 0} ? 'danger' : 'warning'">
+    <h1 th:if="${stock == 0}">¡ALERTA: PRODUCTO AGOTADO!</h1>
+    <h1 th:if="${stock > 0}">AVISO: STOCK BAJO</h1>
+  </div>
+
+  <div class="content">
+    <p>Estimado Administrador/Supervisor,</p>
+    <p>El siguiente producto ha alcanzado un nivel crítico de inventario tras la última venta:</p>
+
+    <div class="product-info">
+      <p><span class="label">ID del Producto:</span> <span class="value" th:text="${producto.id}">#123</span></p>
+      <p><span class="label">Nombre:</span> <span class="value" th:text="${producto.nombre}">Nombre Producto</span></p>
+      <p><span class="label">Categoría:</span> <span class="value" th:text="${producto.categoria.categoria}">Categoría</span></p>
+
+      <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+
+      <p style="text-align: center;">
+        <span class="label">Stock Restante:</span><br>
+        <span class="stock-big"
+              th:classappend="${stock == 0} ? 'text-danger' : 'text-warning'"
+              th:style="${stock == 0} ? 'color: #dc3545' : 'color: #d39e00'"
+              th:text="${stock}">5</span>
+      </p>
+    </div>
+
+    <p style="margin-top: 20px;">Se recomienda gestionar la reposición de este producto lo antes posible.</p>
+  </div>
+</div>
+</body>
+</html>

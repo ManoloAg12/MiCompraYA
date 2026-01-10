@@ -38,6 +38,14 @@
                 <span class="font-medium">Nuevo Estado</span>
             </button>
 
+            <button type="button"
+                    class="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl
+                    hover:bg-blue-50 hover:border-blue-400 hover:text-blue-700 transition-all shadow-sm"
+                    onclick="document.getElementById('modalEditarProducto').showModal()">
+                <i class="ri-edit-2-line text-blue-600"></i>
+                <span class="font-medium">Editar Info. Producto</span>
+            </button>
+
         </div>
 
         <div class="max-w-4xl mx-auto">
@@ -87,7 +95,7 @@
                     </div>
 
                     <!-- Información Comercial -->
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <div class="lg:col-span-3">
                             <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                                 <i class="ri-price-tag-3-line mr-2 text-green-600"></i>Información Comercial
@@ -111,21 +119,6 @@
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg
                                           focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
                                    placeholder="0" required type="number" name="stock">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Estado del Producto *</label>
-                            <div class="relative">
-                                <select
-                                        class="w-full px-4 py-3 pr-8 border border-gray-300 rounded-lg
-                                               focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm
-                                               cursor-pointer appearance-none" required th:field="*{estadoProducto}">
-                                    <option value="">Seleccione un estado</option>
-                                    <option th:each="e : ${estados}"
-                                            th:value="${e.id}"
-                                            th:text="${e.estadoProducto     }">
-                                    </option>
-                                </select>
-                            </div>
                         </div>
                     </div>
 
@@ -186,7 +179,7 @@
                                         </div>
                                     </div>
                                     <div class="text-xs text-gray-500">
-                                        Formatos soportados: JPG, PNG, GIF (máx. 5MB)
+                                        Formatos soportados: JPG, PNG
                                     </div>
                                 </div>
                             </div>
@@ -204,9 +197,9 @@
 
                     <!-- Botones -->
                     <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
-                        <button type="button"
+                        <button type="button" id="btnLimpiar"
                                 class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700
-                                       hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap">
+                                hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap">
                             <i class="ri-refresh-line mr-2"></i>Limpiar Formulario
                         </button>
                         <button type="submit"
@@ -298,6 +291,127 @@
                 </button>
             </div>
         </form>
+    </dialog>
+
+    <dialog id="modalEditarProducto" class="rounded-xl shadow-2xl w-full max-w-5xl p-0 overflow-hidden">
+
+        <div class="bg-gradient-to-r from-green-700 to-green-600 px-5 py-3 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 font-['Montserrat']">
+                <i class="ri-edit-box-line text-xl"></i> Editar Producto
+            </h3>
+            <button type="button" id="btnCerrarEditar" class="text-white/80 hover:text-white text-2xl font-bold transition-colors leading-none">&times;</button>
+        </div>
+
+        <div class="p-6 bg-gray-50"> <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 mb-4 flex items-end gap-3">
+            <div class="flex-grow">
+                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">ID del Producto</label>
+                <div class="relative">
+                    <i class="ri-barcode-line absolute left-3 top-1.5 text-gray-400"></i>
+                    <input type="number" id="inputBuscarIdEditar"
+                           class="w-full pl-9 pr-3 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-green-500 focus:border-green-500 outline-none transition-all text-sm"
+                           placeholder="Ej: 29">
+                </div>
+            </div>
+            <button type="button" id="btnBuscarParaEditar"
+                    class="px-4 py-1.5 bg-green-600 text-white text-sm font-semibold rounded-md hover:bg-green-700 hover:shadow-md transition-all h-[34px] flex items-center gap-2">
+                <i class="ri-search-2-line"></i> Buscar
+            </button>
+        </div>
+
+            <p id="msgEditar" class="text-xs font-medium mb-2 h-4 px-1"></p>
+
+            <form method="post" th:action="@{/productos/editar-info}" enctype="multipart/form-data" id="formEditarProducto" style="display:none;">
+                <input type="hidden" name="productoId" id="hiddenIdEditar">
+
+                <div class="flex flex-col lg:flex-row gap-6"> <div class="w-full lg:w-1/3">
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Imagen del Producto</label>
+                    <div class="bg-white p-3 rounded-lg border-2 border-dashed border-gray-300 hover:border-green-400 transition-colors text-center h-full flex flex-col justify-center min-h-[200px]">
+                        <div class="relative group cursor-pointer mx-auto">
+                            <img id="imgPreviewEditar" src="" alt="Producto" class="h-40 w-auto object-contain mb-2 rounded-lg">
+                            <div class="absolute inset-0 bg-black/50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center" onclick="document.getElementById('fileInputEditar').click()">
+                                <span class="text-white text-sm font-medium"><i class="ri-upload-cloud-line"></i> Cambiar</span>
+                            </div>
+                        </div>
+
+                        <input type="file" name="imagen" id="fileInputEditar" class="hidden" accept="image/*">
+                        <p class="text-[10px] text-gray-400 mt-1">Click en la imagen para cambiar</p>
+                    </div>
+                </div>
+
+                    <div class="w-full lg:w-2/3 space-y-3"> <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Nombre del Producto</label>
+                        <input type="text" name="nombre" id="editNombre"
+                               class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-green-500 focus:border-green-500 outline-none text-sm" required>
+                    </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">Marca</label>
+                                <select name="marcaId" id="editMarca" class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-green-500 text-sm" required>
+                                    <option th:each="m : ${marcas}" th:value="${m.id}" th:text="${m.nombreMarca}"></option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">Categoría</label>
+                                <select name="categoriaId" id="editCategoria" class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-green-500 text-sm" required>
+                                    <option th:each="c : ${categorias}" th:value="${c.id}" th:text="${c.categoria}"></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Stock Actual</label>
+                                <div class="relative">
+                                    <input type="text" id="editStockReadOnly" disabled
+                                           class="w-full px-3 py-1.5 bg-gray-100 border border-gray-200 rounded-md text-gray-600 font-bold cursor-not-allowed text-sm">
+                                    <i class="ri-lock-line absolute right-2 top-2 text-gray-400 text-xs"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">Caducidad</label>
+                                <input type="date" name="caducidad" id="editCaducidad"
+                                       class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-green-500 focus:border-green-500 outline-none text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Descripción</label>
+                            <textarea name="descripcion" id="editDescripcion" rows="2"
+                                      class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-green-500 focus:border-green-500 outline-none resize-y text-sm"
+                                      placeholder="Detalles..." required></textarea>
+                        </div>
+
+                        <div class="pt-2 border-t border-gray-200">
+                            <div class="flex items-center p-2 bg-red-50 border border-red-100 rounded-md hover:bg-red-100 transition-colors cursor-pointer" onclick="document.getElementById('checkDescontinuar').click()">
+                                <div class="flex-shrink-0">
+                                    <input type="checkbox" name="descontinuar" id="checkDescontinuar"
+                                           class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500 cursor-pointer">
+                                </div>
+                                <div class="ml-2">
+                                    <label for="checkDescontinuar" class="text-sm font-bold text-red-700 cursor-pointer select-none">
+                                        Descontinuar Producto
+                                    </label>
+                                    <p class="text-[10px] text-red-600 leading-tight">El producto se ocultará del catálogo.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 mt-6 pt-1 border-t border-gray-200">
+                    <button type="button" onclick="document.getElementById('btnCerrarEditar').click()"
+                            class="px-4 py-2 rounded-md text-sm text-gray-600 hover:bg-gray-200 font-medium transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            class="px-5 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-semibold shadow-sm hover:shadow transition-all flex items-center gap-2">
+                        <i class="ri-save-3-line"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
     </dialog>
 
 

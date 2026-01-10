@@ -17,6 +17,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.micompra.micompraya.services.QrCodeService;
 import com.micompra.micompraya.services.ClienteService;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.*;
 
@@ -148,6 +150,63 @@ public class PedidoController {
 
 
 
+    /**
+     * Muestra la vista inicial de la caja (solo el formulario de búsqueda).
+     */
+    @GetMapping("/caja")
+    public String mostrarVistaCaja(Model model) {
+        model.addAttribute("view", "pedido/caja_view");
+        // No pasamos pedido ni detalles inicialmente
+        return "layout/layout";
+    }
 
+    /**
+     * Busca un pedido pendiente por código y muestra sus detalles si lo encuentra.
+     */
+    @PostMapping("/caja/buscar")
+    public String buscarPedidoCaja(@RequestParam String codigo, Model model, RedirectAttributes redirectAttributes) {
+        // Llama al servicio para buscar el pedido PENDIENTE
+        Pedido pedido = pedidoService.obtenerPedidoPendientePorCodigo(codigo);
+
+        if (pedido != null) {
+            // Si lo encuentra, busca sus detalles
+            List<DetallePedido> detalles = pedidoService.obtenerDetallesPorPedidoId(pedido.getId());
+            model.addAttribute("pedido", pedido);
+            model.addAttribute("detalles", detalles);
+        } else {
+            // Si no lo encuentra o no está pendiente, envía mensaje de error
+            redirectAttributes.addFlashAttribute("tipo", "error");
+            redirectAttributes.addFlashAttribute("mensaje", "Pedido no encontrado con el código '" + codigo + "' o ya no está pendiente.");
+            return "redirect:/caja"; // Redirige de vuelta a la caja vacía
+        }
+
+        model.addAttribute("view", "pedido/caja_view");
+        return "layout/layout"; // Muestra la vista de caja con los datos (o vacía si hubo error)
+    }
+
+    /**
+     * Procesa la compra marcando el pedido como completado.
+     */
+    @PostMapping("/caja/procesar/{pedidoId}")
+    public String procesarCompraCaja(@PathVariable Integer pedidoId,HttpSession session, RedirectAttributes redirectAttributes) {
+        Usuario usuarioLogueado = (Usuario) session.getAttribute("usuario");
+
+        if (usuarioLogueado == null) {
+            redirectAttributes.addFlashAttribute("tipo", "error");
+            redirectAttributes.addFlashAttribute("mensaje", "Debes iniciar sesión para procesar ventas.");
+            return "redirect:/login";
+        }
+        try {
+            // Llama al servicio para cambiar el estado
+            pedidoService.marcarPedidoComoCompletado(pedidoId, usuarioLogueado); //
+            redirectAttributes.addFlashAttribute("tipo", "success");
+            redirectAttributes.addFlashAttribute("mensaje", "¡Pedido procesado con éxito!");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("tipo", "error");
+            // Muestra el mensaje específico del error lanzado por el servicio
+            redirectAttributes.addFlashAttribute("mensaje", "Error al procesar: " + e.getMessage());
+        }
+        return "redirect:/caja"; // Siempre redirige a la vista inicial de caja
+    }
 
 }

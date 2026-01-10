@@ -64,11 +64,20 @@ public class Permisos implements  Filter {
                 || path.endsWith("/registrar")
                 || path.endsWith("/acercaDe")
                 || path.startsWith("/icons")
-                || path.endsWith("/carrito")
+
                 || path.endsWith("/contactenos")
                 || path.endsWith("/contacto/enviar")
                 || path.endsWith("/mensajes_view")
                 || path.endsWith("/mensajes/responder")
+                || path.endsWith("/recuperar-contrasena")
+                || path.endsWith("/recuperar-contrasena/enviar")
+                || path.endsWith("/verificar-correo")
+                || path.endsWith("/producto")
+                || path.startsWith("/webhook")
+                || path.endsWith("/login/firebase")
+                || path.endsWith("/completar-registro")
+                || path.endsWith("/registrar-google")
+                || path.startsWith("/carrito")
                 ;
 
     }
@@ -80,8 +89,18 @@ public class Permisos implements  Filter {
 
             // Rutas solo para ADMIN
             if (path.startsWith("/usuarios")) {
+                return "Administrador".equals(rol) || "Supervisor".equals(rol);
+            }
+            // 1. CAJA: Admin y Cajero
+            if (path.startsWith("/caja")) {
+                return "Administrador".equals(rol) || "Cajero".equals(rol);
+            }
+
+            // 2. REPORTES: Solo Admin
+            if (path.startsWith("/reportes")) {
                 return "Administrador".equals(rol);
             }
+
         }
         return true; // El resto de rutas protegidas solo requieren login
     }

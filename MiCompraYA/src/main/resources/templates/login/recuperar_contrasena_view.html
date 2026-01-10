@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiCompraYa - Recuperar Contraseña</title>
+    <link rel="icon" type="image/png" href="/images/canasta.png">
+
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2ECC71', // Verde primario
+                        secondary: '#27AE60' // Verde secundario
+                    },
+                    borderRadius: {
+                        'none': '0px',
+                        'sm': '4px',
+                        DEFAULT: '8px',
+                        'md': '12px',
+                        'lg': '16px',
+                        'xl': '20px',
+                        '2xl': '24px',
+                        '3xl': '32px',
+                        'full': '9999px',
+                        'button': '8px' // Borde específico para botones si lo usas
+                    },
+                    fontFamily: {
+                        'pacifico': ['Pacifico', 'serif'], // Fuente decorativa
+                        'inter': ['Inter', 'sans-serif'] // Fuente principal
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v7.0.1/css/all.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" >
+
+
+    <style>
+        /* Animaciones (copiadas de login_view.html) */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .animate-fade-in { animation: fadeIn 0.6s ease-out; }
+        .animate-bounce { animation: bounce 2s infinite; }
+
+        /* Estilos personalizados (copiados y adaptados de login_view.html) */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fffe 0%, #e8f8f5 100%);
+            min-height: 100vh;
+            display: flex; /* Asegura centrado vertical */
+            align-items: center; /* Asegura centrado vertical */
+            justify-content: center; /* Asegura centrado horizontal */
+            padding: 1rem; /* Espacio alrededor */
+        }
+        .auth-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(46, 204, 113, 0.1);
+            width: 100%;
+            max-width: 28rem; /* 448px */
+            border-radius: 1rem; /* rounded-2xl */
+            padding: 2rem; /* p-8 */
+        }
+        .form-input {
+            transition: all 0.3s ease;
+            border: 2px solid #e1e5e9; /* Gris claro */
+            width: 100%;
+            padding-left: 2.5rem; /* pl-10 */
+            padding-right: 1rem; /* pr-4 */
+            padding-top: 0.75rem; /* py-3 */
+            padding-bottom: 0.75rem; /* py-3 */
+            border-radius: 0.5rem; /* rounded-lg */
+            outline: none;
+            font-size: 0.875rem; /* text-sm */
+        }
+        .form-input:focus {
+            border-color: #2ECC71; /* primary */
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #2ECC71, #27AE60);
+            transition: all 0.3s ease;
+            width: 100%;
+            padding-top: 0.75rem; /* py-3 */
+            padding-bottom: 0.75rem;
+            padding-left: 1.5rem; /* px-6 */
+            padding-right: 1.5rem;
+            border-radius: 0.5rem; /* rounded-lg */
+            color: white;
+            font-weight: 500; /* font-medium */
+            white-space: nowrap;
+            border-radius: 8px; /* !rounded-button */
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(46, 204, 113, 0.3);
+            /* hover:animate-pulse - Puedes añadir la clase directamente si prefieres */
+        }
+    </style>
+</head>
+<body>
+<div class="auth-container">
+    <div class="text-center mb-8">
+        <div class="flex items-center justify-center mb-4">
+            <div class="w-12 h-12 flex items-center justify-center bg-green-600 rounded-xl mr-3 animate-bounce">
+                <i class="ri-lock-password-line text-white text-xl"></i>
+            </div>
+            <h1 class="font-pacifico text-3xl text-gray-800">Recuperar Contraseña</h1>
+        </div>
+        <p class="text-gray-600 text-sm animate-fade-in">Ingresa tu correo electrónico registrado.</p>
+    </div>
+
+    <div th:if="${error}" class="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-lg text-sm animate-fade-in">
+        <i class="ri-error-warning-line mr-1 align-middle"></i> <span th:text="${error}">Mensaje de error aquí.</span>
+    </div>
+
+    <form class="space-y-6" th:action="@{/recuperar-contrasena/enviar}" method="post">
+        <div>
+            <label for="correoRecuperacion" class="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="ri-mail-line text-gray-400"></i>
+                </div>
+                <input type="email" name="correo" id="correoRecuperacion"
+                       th:value="${correo}" class="form-input"
+                       placeholder="tu@email.com" required>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-primary">
+            Enviar Instrucciones
+        </button>
+
+        <div class="text-center mt-4">
+            <a th:href="@{/login}" class="text-sm text-primary hover:text-secondary transition-colors">
+                <i class="ri-arrow-left-line align-middle"></i> Volver a Iniciar Sesión
+            </a>
+        </div>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/toast.js}"></script>
+<script th:src="@{/js/existe-correo.js}"></script>
+
+</body>
+</html>

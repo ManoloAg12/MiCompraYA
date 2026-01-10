@@ -125,29 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    function mostrarToast(tipo, mensaje) {
-        const colores = {
-            success: 'bg-green-500',
-            error: 'bg-red-500',
-            warning: 'bg-yellow-500',
-            info: 'bg-blue-500'
-        };
 
-        const toast = document.createElement('div');
-        toast.className = `fixed top-5 right-5 text-white px-6 py-3 rounded-lg shadow-lg ${colores[tipo] || 'bg-gray-500'} animate-fade-in z-50`;
-        toast.innerHTML = `<div class="flex items-center gap-2">
-        <i class="ri-information-line text-xl"></i>
-        <span>${mensaje}</span>
-    </div>`;
-
-        document.body.appendChild(toast);
-
-        // Desvanecer después de 4 segundos
-        setTimeout(() => {
-            toast.classList.add('opacity-0', 'transition-opacity', 'duration-700');
-            setTimeout(() => toast.remove(), 700);
-        }, 4000);
-    }
 
     const telefonoInput = document.getElementById('telefono');
     telefonoInput.addEventListener('input', function () {

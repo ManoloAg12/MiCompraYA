@@ -50,6 +50,19 @@ public class CarritoService {
             return;
         }
 
+        // --- 🛡️ VALIDACIÓN DE SEGURIDAD (ANTI-F12) ---
+        // 1. Validar Estado: Si no es "Activo" (ID 1), rechazamos
+        if (producto.getEstadoProducto().getId() != 1) {
+            System.err.println("SEGURIDAD: Intento de agregar producto inactivo: " + producto.getNombre());
+            return; // Rechazamos silenciosamente o podrías lanzar excepción
+        }
+
+        // 2. Validar Stock Real: Si es 0 o menos, rechazamos
+        if (producto.getStock() <= 0) {
+            System.err.println("SEGURIDAD: Intento de agregar producto sin stock: " + producto.getNombre());
+            return;
+        }
+
         //  OBTENEMOS LA CANTIDAD ACTUAL
         Map<Integer, Integer> cantidades = getCantidades(session);
         int cantidadActual = cantidades.getOrDefault(productoId, 0);

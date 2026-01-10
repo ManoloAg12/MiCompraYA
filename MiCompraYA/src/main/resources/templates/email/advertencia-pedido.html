@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Estilos generales (basados en tu confirmacion-pedido.html) */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f7;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    /* Header color Naranja/Advertencia */
+    .header {
+      background-color: #ffc107; /* Naranja de advertencia */
+      color: #1f1f1f; /* Texto oscuro para mejor contraste */
+      padding: 30px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+    .content {
+      padding: 30px;
+      line-height: 1.6;
+      font-size: 16px;
+    }
+    /* Caja de advertencia (basada en la de confirmación) */
+    .warning-box {
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 20px;
+      font-weight: 500;
+    }
+    .footer {
+      background-color: #f8f9fa;
+      padding: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #6c757d;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>¡Tu pedido está por vencer!</h1>
+  </div>
+  <div class="content">
+    <p>Hola, <strong th:text="${pedido.cliente.nombreCompleto}">Nombre del Cliente</strong>,</p>
+    <p>Este es un recordatorio amistoso de que tu pedido está a punto de vencer. Recuerda que tienes <strong>24 horas</strong> desde la confirmación para recoger tu compra.</p>
+
+    <div class="warning-box">
+      <strong>¡Atención!</strong> Queda <strong>menos de 1 hora</strong> para recoger tu pedido. Si no lo recoges a tiempo, será cancelado automáticamente.
+    </div>
+
+    <h3 style="margin-top: 30px; border-bottom: 2px solid #ffc107; padding-bottom: 5px;">Tu Pedido</h3>
+    <p><strong>Código de Pedido:</strong> <span th:text="${pedido.codigo}" style="font-family: monospace; background-color: #e9ecef; padding: 3px 6px; border-radius: 4px;">CODIGO123</span></p>
+    <p><strong>Total:</strong> <span th:text="'$' + ${#numbers.formatDecimal(pedido.total, 1, 2)}" style="font-weight: bold; color: #28a745;">$0.00</span></p>
+
+    <p style="margin-top: 25px;">Por favor, acércate a la tienda lo antes posible con tu código QR (enviado en el correo de confirmación) para retirar tu compra.</p>
+  </div>
+  <div class="footer">
+    <p>Gracias por elegir MiCompraYA.</p>
+    <p>&copy; <span th:text="${#dates.year(#dates.createNow())}">2025</span> MiCompraYA. Todos los derechos reservados.</p>
+  </div>
+</div>
+</body>
+</html>

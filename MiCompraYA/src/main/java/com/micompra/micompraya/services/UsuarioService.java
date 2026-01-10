@@ -1,6 +1,9 @@
 package com.micompra.micompraya.services;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
 import com.micompra.micompraya.models.*;
+import com.micompra.micompraya.repositories.ClienteRepository;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -17,9 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
@@ -31,6 +32,7 @@ public class UsuarioService {
     private final EstadoRepository estadoRepo;
     private final EmailService emailService;
     private final ClienteService clienteService;
+    private final ClienteRepository clienteRepo;
 
     //listar todos los usuarios.
     @Transactional(readOnly = true)
@@ -86,14 +88,14 @@ public class UsuarioService {
     private void validarUsuario(String usuario){
         Assert.hasText(usuario, "El usuario es requerido");
         if (usuarioRepo.findByNombreUsuario(usuario).isPresent()){
-            throw new IllegalArgumentException("El usuario"+ usuario + "ya existe");
+            throw new IllegalArgumentException("El usuario "+ usuario + " ya existe");
         }
     }
     //verificar el correo no sea repetido
     private void validarCorreo(String correo){
         Assert.hasText(correo, "El correo es requerido");
         if (usuarioRepo.findByCorreo(correo).isPresent()){
-            throw new IllegalArgumentException("El correo"+ correo + "ya existe");
+            throw new IllegalArgumentException("El correo "+ correo + " ya existe");
         }
     }
 
@@ -141,8 +143,8 @@ public class UsuarioService {
         Assert.hasText(usuario.getCorreo(), "El correo es requerido");
         Assert.notNull(usuario.getRol(), "El rol es requerido");
         Assert.notNull(usuario.getRol().getId(), "El ID de Rol es requerido");
-        Assert.notNull(usuario.getEstado(), "El estado es requerido");
-        Assert.notNull(usuario.getEstado().getId(), "El ID de Estado es requerido");
+
+
 
         validarUsuario(usuario.getNombreUsuario());
         validarCorreo(usuario.getCorreo());
@@ -151,8 +153,12 @@ public class UsuarioService {
         // Buscamos las entidades completas aquí, en el servicio
         Rol rol = rolRepo.findById(usuario.getRol().getId())
                 .orElseThrow(() -> new IllegalArgumentException("El rol con ID " + usuario.getRol().getId() + " no existe"));
-        Estado estado = estadoRepo.findById(usuario.getEstado().getId())
-                .orElseThrow(() -> new IllegalArgumentException("El estado con ID " + usuario.getEstado().getId() + " no existe"));
+        Integer estadoId = (usuario.getEstado() != null && usuario.getEstado().getId() != null) ? usuario.getEstado().getId() : 1;
+
+        Estado estado = estadoRepo.findById(estadoId)
+                .orElseThrow(() -> new IllegalArgumentException("El estado con ID " + estadoId + " no existe"));
+
+        usuario.setEstado(estado);
 
         usuario.setRol(rol);
         usuario.setEstado(estado);
@@ -367,8 +373,153 @@ public class UsuarioService {
     }
 
 
+    public void recuperarContrasenaPorCorreo(String correo) {
+        Assert.hasText(correo, "El correo no puede estar vacío.");
+
+        // 1. Buscar al usuario por correo
+        Usuario usuario = usuarioRepo.findByCorreo(correo)
+                .orElseThrow(() -> new IllegalArgumentException("El correo electrónico ingresado no está registrado."));
+
+        // 2. Generar nueva contraseña temporal
+        String nuevaContrasenaPlano = generarContrasena(8); // Reutiliza tu método existente
+
+        // --- CAMBIO DE ORDEN ---
+        // 3. Enviar PRIMERO el correo con la contraseña en texto plano
+        try {
+            emailService.sendEmail(
+                    usuario.getCorreo(),
+                    "Recuperación de Contraseña - MiCompraYA",
+                    "Hola " + usuario.getNombreUsuario() + ",\n\n" +
+                            "Hemos generado una nueva contraseña temporal para tu cuenta:\n\n" +
+                            "👉 " + nuevaContrasenaPlano + "\n\n" +
+                            "Por favor, inicia sesión con esta contraseña y cámbiala lo antes posible desde la configuración de tu cuenta.\n\n" +
+                            "Si no solicitaste esto, puedes ignorar este correo.\n\n" +
+                            "Atentamente,\n" +
+                            "El equipo de MiCompraYA"
+            );
+        } catch (Exception e) {
+            // Si falla el envío del correo, lanzamos una excepción.
+            // Gracias a @Transactional, esto evitará que se guarde la nueva contraseña.
+            throw new RuntimeException("Error al enviar el correo de recuperación. La contraseña no ha sido cambiada.", e);
+        }
+
+        // --- CONTINÚA SI EL CORREO SE ENVIÓ CORRECTAMENTE ---
+        // 4. Hashear la nueva contraseña
+        String nuevaContrasenaHasheada = BCrypt.hashpw(nuevaContrasenaPlano, BCrypt.gensalt());
+
+        // 5. Actualizar la contraseña en el objeto Usuario
+        usuario.setContrasena(nuevaContrasenaHasheada);
+
+        // 6. Guardar los cambios en la base de datos (SOLO si el correo se envió)
+        usuarioRepo.save(usuario);
+    }
+
+    @Transactional(readOnly = true) // Es una consulta, no modifica nada
+    public boolean existeCorreo(String correo) {
+        if (correo == null || correo.isBlank()) {
+            return false; // No consideramos correos vacíos como existentes
+        }
+        // findByCorreo devuelve un Optional<Usuario>. isPresent() nos dice si encontró algo.
+        return usuarioRepo.findByCorreo(correo).isPresent();
+    }
 
 
+    public Map<String, Object> procesarLoginGoogle(String idToken) throws Exception {
+        Map<String, Object> resultado = new HashMap<>();
 
+        // 1. Lógica de Negocio: Verificar con Firebase (Integración externa)
+        FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+        String email = decodedToken.getEmail();
+        String nombre = decodedToken.getName();
+
+        // 2. Lógica de Negocio: Verificar existencia en BD
+        Optional<Usuario> usuarioOpt = usuarioRepo.findByCorreo(email);
+
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
+
+            // Regla de Negocio: Validar estado
+            if (usuario.getEstado().getId() != 1) {
+                resultado.put("status", "error");
+                resultado.put("message", "Usuario inactivo. Contacte al administrador.");
+                return resultado;
+            }
+
+            // Usuario válido encontrado
+            resultado.put("status", "success");
+            resultado.put("usuarioEncontrado", usuario); // Pasamos la entidad al controlador
+            resultado.put("redirect", "/home");
+
+        } else {
+            // Usuario nuevo
+            resultado.put("status", "new_user");
+            resultado.put("googleEmail", email);
+            resultado.put("googleNombre", nombre);
+            resultado.put("redirect", "/completar-registro");
+        }
+
+        return resultado;
+    }
+
+    public Map<String, Object> obtenerDatosPerfilCompleto(Integer usuarioId) {
+        Usuario usuario = usuarioRepo.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Buscar datos de cliente si existen
+        Optional<Cliente> clienteOpt = clienteRepo.findByUsuario_Id(usuarioId);
+
+        Map<String, Object> datos = new HashMap<>();
+        datos.put("nombreUsuario", usuario.getNombreUsuario());
+        datos.put("correo", usuario.getCorreo());
+
+        if (clienteOpt.isPresent()) {
+            Cliente cliente = clienteOpt.get();
+            datos.put("nombreCompleto", cliente.getNombreCompleto());
+            datos.put("telefono", cliente.getTelefono());
+            datos.put("direccion", cliente.getDireccion());
+        } else {
+            datos.put("nombreCompleto", "");
+            datos.put("telefono", "");
+            datos.put("direccion", "");
+        }
+        return datos;
+    }
+
+    @Transactional
+    public Usuario actualizarPerfilCompleto(Integer usuarioId, Map<String, String> datos) {
+        Usuario usuario = usuarioRepo.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        String nuevoUsuario = datos.get("nombreUsuario");
+        String nuevoCorreo = datos.get("correo");
+
+        // Validar unicidad solo si cambiaron
+        if (!usuario.getNombreUsuario().equals(nuevoUsuario)) {
+            validarUsuario(nuevoUsuario); // Tu método privado existente
+            usuario.setNombreUsuario(nuevoUsuario);
+        }
+        if (!usuario.getCorreo().equals(nuevoCorreo)) {
+            validarCorreo(nuevoCorreo); // Tu método privado existente
+            usuario.setCorreo(nuevoCorreo);
+        }
+
+        // Actualizar datos de Cliente
+        Optional<Cliente> clienteOpt = clienteRepo.findByUsuario_Id(usuarioId);
+        Cliente cliente;
+        if (clienteOpt.isPresent()) {
+            cliente = clienteOpt.get();
+        } else {
+            // Si era un admin y quiere agregar datos de cliente ahora
+            cliente = new Cliente();
+            cliente.setUsuario(usuario);
+        }
+
+        cliente.setNombreCompleto(datos.get("nombreCompleto"));
+        cliente.setTelefono(datos.get("telefono"));
+        cliente.setDireccion(datos.get("direccion"));
+
+        clienteRepo.save(cliente);
+        return usuarioRepo.save(usuario); // Retornamos usuario actualizado
+    }
 
 }

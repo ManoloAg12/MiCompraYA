@@ -4,6 +4,7 @@ import com.micompra.micompraya.models.EstadoProducto;
 import com.micompra.micompraya.repositories.EstadoProductoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +22,11 @@ public class EstadoProductoService {
     //buscar estado de producto por id
     public EstadoProducto findById(Integer id) {
         return estadoProductoRepository.findById(id).orElse(null);
+    }
+
+    @Transactional
+    public void guardar(EstadoProducto estado) {
+        estadoProductoRepository.save(estado);
     }
 
 }

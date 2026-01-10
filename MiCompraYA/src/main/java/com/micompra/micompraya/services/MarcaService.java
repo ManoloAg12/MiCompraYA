@@ -22,4 +22,9 @@ public class MarcaService {
         return marcaRepository.findById(id).orElse(null);
     }
 
+    //guardar marca
+    public Marca guardar(Marca marca) {
+        return marcaRepository.save(marca);
+    }
+
 }

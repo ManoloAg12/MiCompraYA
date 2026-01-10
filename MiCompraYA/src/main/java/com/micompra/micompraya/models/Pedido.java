@@ -36,6 +36,11 @@ public class Pedido {
     @JoinColumn(name = "id_tipo_pago")
     private TipoPago tipoPago;
 
+    // --- NUEVO CAMPO ---
+    @Column(name = "advertencia_enviada", nullable = false)
+    @ColumnDefault("false") // Valor por defecto en la BD (para PostgreSQL)
+    private Boolean advertenciaEnviada = false;
+
     public Integer getId() {
         return id;
     }
@@ -92,6 +97,16 @@ public class Pedido {
         this.tipoPago = tipoPago;
     }
 
+    // --- NUEVOS GETTER Y SETTER ---
+    public Boolean getAdvertenciaEnviada() {
+        return advertenciaEnviada;
+    }
+
+    public void setAdvertenciaEnviada(Boolean advertenciaEnviada) {
+        // Aseguramos que no se guarde null si viene de la BD
+        this.advertenciaEnviada = (advertenciaEnviada != null) ? advertenciaEnviada : false;
+    }
+
     public Pedido() {
     }
 
@@ -103,6 +118,7 @@ public class Pedido {
         this.codigo = codigo;
         this.total = total;
         this.tipoPago = tipoPago;
+        this.advertenciaEnviada = (advertenciaEnviada != null) ? advertenciaEnviada : false;
     }
 
     @Override
@@ -115,6 +131,7 @@ public class Pedido {
                 ", codigo='" + codigo + '\'' +
                 ", total=" + total +
                 ", tipoPago=" + tipoPago +
+                ", advertenciaEnviada=" + advertenciaEnviada +
                 '}';
     }
 }

@@ -1,13 +1,20 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-    // --- 1. Lógica para la Previsualización de la imagen ---
+    // --- 1. Lógica para la Imagen (Ocultar texto y mostrar solo foto) ---
     const fileInput = document.querySelector('input[name="imagen"]');
-    const imageContainer = document.querySelector('.border-2'); // Contenedor de la imagen
+    const imageContainer = document.querySelector('.border-2'); // El recuadro punteado
 
-    // ✅ Solo ejecuta este bloque si los elementos necesarios existen
+    // Variables para controlar lo que se muestra y se oculta
+    let uploadContent = null; // El texto, icono y botón
+    let previewWrapper = null; // Donde pondremos la foto
+
     if (fileInput && imageContainer) {
-        const previewWrapper = document.createElement('div');
-        previewWrapper.classList.add('mt-4', 'flex', 'justify-center');
+        // Identificamos el div interno que tiene el texto y el icono
+        uploadContent = imageContainer.querySelector('div.flex.flex-col');
+
+        // Creamos el contenedor para la imagen (inicialmente oculto)
+        previewWrapper = document.createElement('div');
+        previewWrapper.classList.add('hidden', 'w-full', 'h-full', 'flex', 'justify-center', 'items-center');
         imageContainer.appendChild(previewWrapper);
 
         fileInput.addEventListener('change', function() {
@@ -15,57 +22,87 @@ document.addEventListener("DOMContentLoaded", function() {
             if (file && file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    previewWrapper.innerHTML = `<img src="${e.target.result}" alt="Preview" class="max-h-48 rounded-lg">`;
+                    // A. Ocultamos el texto y el botón original
+                    if (uploadContent) uploadContent.classList.add('hidden');
+
+                    // B. Mostramos la imagen ocupando el espacio
+                    previewWrapper.innerHTML = `<img src="${e.target.result}" alt="Preview" class="max-h-64 w-auto object-contain rounded-lg shadow-sm">`;
+                    previewWrapper.classList.remove('hidden');
+
+                    // Opcional: Reducir el padding del contenedor para que la imagen se vea más grande
+                    imageContainer.classList.remove('p-8');
+                    imageContainer.classList.add('p-2');
+                    // Cambiar borde a sólido para indicar "listo"
+                    imageContainer.classList.remove('border-dashed', 'border-gray-300');
+                    imageContainer.classList.add('border-solid', 'border-green-500');
                 };
                 reader.readAsDataURL(file);
             } else {
-                previewWrapper.innerHTML = '';
+                // Si no es imagen válida, reseteamos
+                resetImageUpload();
             }
         });
 
-        // Hacer clic en el contenedor para abrir el selector de archivos
-        imageContainer.addEventListener('click', () => fileInput.click());
+        // Permitir clic en todo el contenedor para cambiar la imagen
+        imageContainer.addEventListener('click', (e) => {
+            // Evitamos bucle infinito si el clic viene del input mismo
+            if (e.target !== fileInput) {
+                fileInput.click();
+            }
+        });
     }
 
-    // --- 2. Lógica para el Contador de caracteres de la descripción ---
-    const textarea = document.querySelector('textarea[name="descripcion"]');
+    // Función para restaurar el estado original (texto visible, imagen oculta)
+    function resetImageUpload() {
+        if (fileInput) fileInput.value = '';
 
-    // ✅ Solo ejecuta si la textarea existe
+        if (previewWrapper) {
+            previewWrapper.innerHTML = '';
+            previewWrapper.classList.add('hidden');
+        }
+
+        if (uploadContent) {
+            uploadContent.classList.remove('hidden');
+        }
+
+        if (imageContainer) {
+            // Restaurar estilos originales
+            imageContainer.classList.add('p-8', 'border-dashed', 'border-gray-300');
+            imageContainer.classList.remove('p-2', 'border-solid', 'border-green-500');
+        }
+    }
+
+    // --- 2. Contador de Caracteres ---
+    const textarea = document.querySelector('textarea[name="descripcion"]');
     if (textarea) {
         const counter = textarea.nextElementSibling;
-
-        // Y solo añade el listener si el contador también existe
         if (counter) {
             textarea.addEventListener('input', () => {
-                const length = textarea.value.length;
-                const max = textarea.getAttribute('maxlength');
-                counter.textContent = `${length}/${max} caracteres`;
+                counter.textContent = `${textarea.value.length}/${textarea.getAttribute('maxlength')} caracteres`;
             });
         }
     }
 
-    // --- 3. Lógica para Limpiar el formulario ---
-    const clearButton = document.querySelector('button[type="button"]'); // Botón Limpiar
+    // --- 3. Limpiar Formulario (Reset completo) ---
+    const clearButton = document.getElementById('btnLimpiar');
     const form = document.querySelector('form');
 
-    // ✅ Solo ejecuta si el botón y el formulario existen
     if (clearButton && form) {
         clearButton.addEventListener('click', () => {
-            form.reset(); // Limpiar todos los inputs y selects
+            form.reset();
 
-            // Limpiar la previsualización de la imagen (si existe)
-            const previewWrapper = imageContainer?.querySelector('.flex');
-            if (previewWrapper) {
-                previewWrapper.innerHTML = '';
-            }
+            // 1. Restaurar visualmente el área de carga de imagen
+            resetImageUpload();
 
-            // Resetear el contador de caracteres (si existe)
-            if (textarea) {
-                const counter = textarea.nextElementSibling;
-                if(counter) {
-                    counter.textContent = `0/${textarea.getAttribute('maxlength')} caracteres`;
-                }
+            // 2. Resetear contador de caracteres
+            if (textarea && textarea.nextElementSibling) {
+                textarea.nextElementSibling.textContent = `0/${textarea.getAttribute('maxlength')} caracteres`;
             }
         });
+    }
+    const fechaInput = document.querySelector('input[name="caducidad"]');
+    if (fechaInput) {
+        const hoy = new Date().toISOString().split('T')[0];
+        fechaInput.setAttribute('min', hoy);
     }
 });

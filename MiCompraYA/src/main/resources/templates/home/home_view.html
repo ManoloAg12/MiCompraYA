@@ -1,18 +1,22 @@
 <div th:fragment="content">
-    <!-- Hero Section -->
     <section class="hero-bg relative h-[600px] flex items-center justify-center text-white">
         <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
-                <h1 class="font-['Playfair_Display'] text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                <h1 class="font-['Playfair_Display'] text-5xl md:text-7xl font-bold mb-6 leading-tight
+                       drop-shadow-lg">
                     Frescura &amp; Calidad<br>
-                    <span class="text-red-600">Entregadas en Casa</span>
+                    <span class="text-lime-400">Al Instante</span>
                 </h1>
-                <p class="font-['Inter'] text-xl md:text-2xl mb-8 text-gray-100 max-w-2xl mx-auto">
-                    Desde la Granja a tu Puerta - Experimenta productos de calidad premium con entrega a domicilio conveniente
+                <p class="font-['Inter'] text-xl md:text-2xl mb-8 text-gray-100 max-w-2xl mx-auto
+                      drop-shadow-md">
+                    Explora nuestra selección de productos premium, siempre frescos y listos para ti en tienda.
                 </p>
-                <button class="!rounded-button whitespace-nowrap bg-red-600 hover:bg-opacity-90 text-white px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
+                <a th:href="@{/producto}"
+                   class="!rounded-button whitespace-nowrap
+          bg-green-500 hover:bg-green-600 text-white
+          px-8 py-4 text-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
                     Comprar Ahora
-                </button>
+                </a>
             </div>
         </div>
         <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 scroll-indicator">
@@ -88,79 +92,49 @@
             <div class="flex items-center justify-between mb-12 fade-in visible">
                 <div>
                     <h2 class="font-['Playfair_Display'] text-4xl font-bold text-gray-900 mb-2">Productos Destacados</h2>
-                    <p class="font-['Inter'] text-lg text-gray-600">Selecciones cuidadosamente elegidas para ti</p>
+                    <p class="font-['Inter'] text-lg text-gray-600">Nuestros productos con mayor disponibilidad</p>
                 </div>
-                <button class="!rounded-button whitespace-nowrap text-primary border border-primary px-6 py-3 hover:bg-primary hover:text-white transition-all duration-300">
+                <a th:href="@{/producto}" class="!rounded-button whitespace-nowrap text-primary border border-primary px-6 py-3 hover:bg-primary hover:text-white transition-all duration-300">
                     Ver Todos
-                </button>
+                </a>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group">
+
+                <div th:if="${#lists.isEmpty(productosDestacados)}" class="lg:col-span-4 text-center text-gray-500 py-10">
+                    <p>No hay productos destacados disponibles en este momento.</p>
+                </div>
+
+                <div th:each="producto : ${productosDestacados}"
+                     class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col">
+
                     <div class="aspect-square overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Aguacates Orgánicos" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300">
+                        <img th:src="${producto.urlImagen}" th:alt="${producto.nombre}" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300">
                     </div>
-                    <div class="p-6">
-                        <h3 class="font-['Inter'] font-semibold text-lg text-gray-900 mb-2">Aguacates Orgánicos</h3>
-                        <p class="text-gray-600 text-sm mb-4">Frescos de granjas de California</p>
-                        <div class="flex items-center justify-between">
-                            <span class="font-bold text-xl text-primary">$4.99</span>
-                            <button class="!rounded-button whitespace-nowrap bg-primary text-white px-4 py-2 text-sm hover:bg-opacity-90 transition-colors duration-300">
+
+
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="font-['Inter'] font-semibold text-lg text-gray-900 mb-2" th:text="${producto.nombre}">Nombre Producto</h3>
+
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2" th:text="${producto.descripcion}">Descripción corta...</p>
+
+
+                        <div class="flex items-center justify-between mt-auto">
+                            <span class="font-bold text-xl text-primary" th:text="'$' + ${#numbers.formatDecimal(producto.precio, 1, 2, 'POINT')}">$0.00</span>
+                            <button th:if="${session.usuario != null}" type="button"
+                                    class="agregar-carrito !rounded-button whitespace-nowrap bg-primary text-white px-4 py-2 text-sm hover:bg-opacity-90 transition-colors duration-300"
+                                    th:attr="data-idproducto=${producto.id}, data-stock=${producto.stock}">
                                 Añadir al Carrito
                             </button>
+
+                            <a th:unless="${session.usuario != null}" th:href="@{/login}"
+                               class="!rounded-button whitespace-nowrap bg-primary text-white px-4 py-2 text-sm hover:bg-opacity-90 transition-colors duration-300 flex items-center justify-center">
+                                Añadir al Carrito
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group">
-                    <div class="aspect-square overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Carne Premium" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="font-['Inter'] font-semibold text-lg text-gray-900 mb-2">Carne de Res Premium</h3>
-                        <p class="text-gray-600 text-sm mb-4">De origen local, sin hormonas</p>
-                        <div class="flex items-center justify-between">
-                            <span class="font-bold text-xl text-primary">$24.99</span>
-                            <button class="!rounded-button whitespace-nowrap bg-primary text-white px-4 py-2 text-sm hover:bg-opacity-90 transition-colors duration-300">
-                                Añadir al Carrito
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-
-
-                <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group">
-                    <div class="aspect-square overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Pan Artesanal" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="font-['Inter'] font-semibold text-lg text-gray-900 mb-2">Pan de Masa Madre</h3>
-                        <p class="text-gray-600 text-sm mb-4">Horneado fresco diariamente</p>
-                        <div class="flex items-center justify-between">
-                            <span class="font-bold text-xl text-primary">$6.99</span>
-                            <button class="!rounded-button whitespace-nowrap bg-primary text-white px-4 py-2 text-sm hover:bg-opacity-90 transition-colors duration-300">
-                                Añadir al Carrito
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group">
-                    <div class="aspect-square overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1498557850523-fd3d118b962e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Arándanos Orgánicos" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="font-['Inter'] font-semibold text-lg text-gray-900 mb-2">Arándanos Orgánicos</h3>
-                        <p class="text-gray-600 text-sm mb-4">Súper fruta rica en antioxidantes</p>
-                        <div class="flex items-center justify-between">
-                            <span class="font-bold text-xl text-primary">$8.99</span>
-                            <button class="!rounded-button whitespace-nowrap bg-primary text-white px-4 py-2 text-sm hover:bg-opacity-90 transition-colors duration-300">
-                                Añadir al Carrito
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -169,25 +143,60 @@
     <section class="py-20 bg-gradient-to-r from-primary to-teal-600 text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div class="fade-in visible">
+
+                <div th:if="${session.usuario == null}" class="fade-in visible">
                     <h2 class="font-['Playfair_Display'] text-4xl md:text-5xl font-bold mb-6">
-                        Ofertas Especiales Esta Semana
+                        Únete a MiCompraYA
                     </h2>
                     <p class="font-['Inter'] text-xl mb-8 text-gray-100">
-                        Ahorra hasta un 30% en productos orgánicos premium y artesanales. Oferta por tiempo limitado para nuestros valiosos clientes.
+                        Crea tu cuenta para agilizar tu proceso de pago en tienda y ver tu historial de compras. ¡Es rápido y fácil!
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4">
-                        <button class="!rounded-button whitespace-nowrap bg-danger hover:bg-opacity-90 text-white px-8 py-4 font-semibold transition-all duration-300 hover:scale-105">
-                            Ver Ofertas
-                        </button>
-                        <button class="!rounded-button whitespace-nowrap border-2 border-white text-white hover:bg-white hover:text-primary px-8 py-4 font-semibold transition-all duration-300">
-                            Más Información
-                        </button>
+                        <a th:href="@{/login}"
+                           class="!rounded-button whitespace-nowrap
+                          bg-orange-500 hover:bg-orange-600 text-white
+                          px-8 py-4 font-semibold transition-all duration-300 hover:scale-105 shadow-lg">
+                            Crear Cuenta
+                        </a>
+                        <a th:href="@{/acercaDe}"
+                           class="!rounded-button whitespace-nowrap
+                          border-2 border-green-600 text-white
+                          hover:bg-green-600 hover:text-green-700
+                          px-8 py-4 font-semibold transition-all duration-300">
+                            Saber Más
+                        </a>
                     </div>
                 </div>
-                <div class="relative">
-                    <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Ofertas Especiales" class="rounded-2xl shadow-2xl object-cover object-top w-full h-96">
+
+                <div th:if="${session.usuario != null}" class="fade-in visible">
+                    <h2 class="font-['Playfair_Display'] text-4xl md:text-5xl font-bold mb-6">
+                        ¡Hola de nuevo, <span th:text="${session.usuario.nombreUsuario}">Usuario</span>!
+                    </h2>
+                    <p class="font-['Inter'] text-xl mb-8 text-gray-100">
+                        ¿Listo para tu próxima compra? Revisa tu historial de pedidos o explora los nuevos productos que han llegado.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a th:href="@{/pedido/pedidos_view}"
+                           class="!rounded-button whitespace-nowrap
+                          bg-orange-500 hover:bg-orange-600 text-white
+                          px-8 py-4 font-semibold transition-all duration-300 hover:scale-105 shadow-lg">
+                            Ver Mis Pedidos
+                        </a>
+                        <a th:href="@{/producto}"
+                           class="!rounded-button whitespace-nowrap
+                          border-2 border-green-600 text-white
+                          hover:bg-green-600 hover:text-green-700
+                          px-8 py-4 font-semibold transition-all duration-300">
+                            Ir a la Tienda
+                        </a>
+                    </div>
                 </div>
+
+                <div class="relative">
+                    <img th:if="${session.usuario == null}" src="https://images.unsplash.com/photo-1583258292688-d0213dc5a3a8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Persona comprando" class="rounded-2xl shadow-2xl object-cover object-top w-full h-96">
+                    <img th:if="${session.usuario != null}" src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Ingredientes frescos" class="rounded-2xl shadow-2xl object-cover object-top w-full h-96">
+                </div>
+
             </div>
         </div>
     </section>

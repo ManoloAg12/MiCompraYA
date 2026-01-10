@@ -7,6 +7,10 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.scheduling.annotation.Scheduled; // 1. IMPORTAR
+import com.micompra.micompraya.repositories.ProductoRepository;
+
+import java.util.List;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,6 +29,21 @@ public class PedidoService {
     private final EstadoPedidoRepository estadoPedidoRepository;
     private final TipoPagoRepository tipoPagoRepository;
     private final QrCodeService qrCodeService;
+    private final ProductoRepository productoRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final EstadoProductoRepository estadoProductoRepository;
+    private final TransaccionService transaccionService;
+
+    // Definimos los IDs de estado (basado en tu código)
+    private static final int ESTADO_PENDIENTE = 1;
+    private static final int ESTADO_COMPLETADO = 2;
+    private static final int ESTADO_CANCELADO = 3;
+    private final FacturaPdfService facturaPdfService;
+
+    // Tiempos para pruebas (Advertencia a 30s, Cancelación a 90s)
+    private static final int SEGUNDOS_PARA_CANCELAR = 240; // 1 minuto y medio
+    private static final int SEGUNDOS_PARA_ADVERTIR_FIN = 120; // Límite superior de la ventana de advertencia (30s de antigüedad)
+    private static final int SEGUNDOS_PARA_ADVERTIR_INICIO = SEGUNDOS_PARA_CANCELAR; // Límite inferior (igual a cancelación)
 
     // Servicios de apoyo
     private final CarritoService carritoService;
@@ -154,4 +173,214 @@ public class PedidoService {
         byte[] qrCodeBytes = qrCodeService.generarQrCode(texto, ancho, alto);
         return Base64.getEncoder().encodeToString(qrCodeBytes);
     }
+
+    /**
+     * Tarea programada para verificar y gestionar pedidos pendientes.
+     * Se ejecuta automáticamente cada hora (3,600,000 milisegundos).
+     *
+     * (fixedRate = 3600000) = 1 hora
+     * (Para probar en desarrollo, puedes usar 60000 = 1 minuto)
+     */
+    // Ejecutamos cada 30 segundos para pruebas
+    @Scheduled(fixedRate = 60000) // Ejecutar cada 30 segundos
+    @Transactional // Cubre toda la ejecución del método
+    public void gestionarVencimientoDePedidos() {
+
+        System.out.println("TAREA PROGRAMADA (CON FLAG): Verificando vencimiento... " + LocalDateTime.now());
+        LocalDateTime ahora = LocalDateTime.now();
+
+        // --- 1. CANCELAR PEDIDOS VENCIDOS (>= 90 segundos) ---
+        LocalDateTime limiteCancelacion = ahora.minusSeconds(SEGUNDOS_PARA_CANCELAR);
+        List<Pedido> pedidosParaCancelar = pedidoRepository.findByEstadoPedido_IdAndFechaPedidoBefore(
+                ESTADO_PENDIENTE,
+                limiteCancelacion
+        );
+
+        if (!pedidosParaCancelar.isEmpty()) {
+            EstadoPedido estadoCancelado = estadoPedidoRepository.findById(ESTADO_CANCELADO)
+                    .orElseThrow(() -> new RuntimeException("El estado 'Cancelado' (ID " + ESTADO_CANCELADO + ") no está configurado."));
+
+            for (Pedido pedido : pedidosParaCancelar) {
+                // Cambiar estado y guardar primero
+                pedido.setEstadoPedido(estadoCancelado);
+                Pedido pedidoCancelado = pedidoRepository.save(pedido);
+
+                // Intentar enviar correo después
+                try {
+                    emailService.enviarCorreoCancelacion(pedidoCancelado);
+                    System.out.println("Pedido " + pedidoCancelado.getCodigo() + " CANCELADO y correo enviado.");
+                } catch (Exception e) {
+                    System.err.println("ERROR al enviar correo de cancelación para " + pedidoCancelado.getCodigo() + " (Pedido ya cancelado en BD): " + e.getMessage());
+                }
+            }
+        }
+
+        // --- 2. ADVERTIR SOBRE PEDIDOS PRÓXIMOS A VENCER (entre 30 y < 90 segundos) Y SIN ADVERTENCIA PREVIA ---
+        LocalDateTime limiteAdvertenciaInicio = ahora.minusSeconds(SEGUNDOS_PARA_ADVERTIR_INICIO); // Límite inferior (90s)
+        LocalDateTime limiteAdvertenciaFin = ahora.minusSeconds(SEGUNDOS_PARA_ADVERTIR_FIN);   // Límite superior (30s)
+
+        // ✅ USA EL MÉTODO DEL REPOSITORIO QUE FILTRA POR advertenciaEnviada = false
+        List<Pedido> pedidosParaAdvertir = pedidoRepository.findByEstadoPedido_IdAndFechaPedidoBetweenAndAdvertenciaEnviadaFalse(
+                ESTADO_PENDIENTE,
+                limiteAdvertenciaInicio,
+                limiteAdvertenciaFin
+        );
+
+        for (Pedido pedido : pedidosParaAdvertir) {
+            try {
+                // Intentamos enviar el correo PRIMERO
+                emailService.enviarCorreoAdvertenciaVencimiento(pedido);
+                System.out.println("Advertencia de vencimiento enviada para pedido " + pedido.getCodigo());
+
+                // ✅ SI el correo se envió con éxito, MARCAMOS el pedido y guardamos
+                pedido.setAdvertenciaEnviada(true); // Establece el flag
+                pedidoRepository.save(pedido); // Guarda el cambio del flag
+
+            } catch (Exception e) {
+                // Si el correo falla, NO marcamos el pedido. Lo intentará de nuevo en la próxima ejecución.
+                System.err.println("ERROR al enviar advertencia para " + pedido.getCodigo() + ". Se reintentará. Causa: " + e.getMessage());
+            }
+        }
+    }
+
+    //obtener el codigo del pedido
+    @Transactional(readOnly = true) // Solo lectura
+    public Pedido obtenerPedidoPendientePorCodigo(String codigo) {
+        if (codigo == null || codigo.isBlank()) {
+            return null;
+        }
+        Optional<Pedido> pedidoOpt = pedidoRepository.findByCodigo(codigo);
+
+        // Verifica si existe Y si su estado es PENDIENTE (ID 1)
+        if (pedidoOpt.isPresent() && pedidoOpt.get().getEstadoPedido().getId() == ESTADO_PENDIENTE) {
+            return pedidoOpt.get();
+        }
+        return null; // No encontrado o no está pendiente
+    }
+
+    //Confirmar pedido a entregado
+    @Transactional // ¡MUY IMPORTANTE! Si falla el descuento de stock, se revierte el cambio de estado.
+    public Pedido marcarPedidoComoCompletado(Integer pedidoId,Usuario cajero) {
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new RuntimeException("Pedido no encontrado con ID: " + pedidoId));
+
+
+        if (pedido.getEstadoPedido().getId() != ESTADO_PENDIENTE) {
+            throw new IllegalStateException("Solo se pueden procesar pedidos que están pendientes. Estado actual: " + pedido.getEstadoPedido().getEstadoPedido());
+        }
+
+        // --- LÓGICA: DESCONTAR STOCK ---
+        // 3. Obtener los detalles del pedido (Necesario para stock Y para el PDF/Email)
+        List<DetallePedido> detalles = detallePedidoRepository.findByPedido_Id(pedidoId);
+        if (detalles.isEmpty()) {
+            System.err.println("Advertencia: El pedido " + pedido.getCodigo() + " no tiene detalles para descontar stock.");
+        }
+        String[] correosStaff = null;
+
+        for (DetallePedido detalle : detalles) {
+            Producto producto = detalle.getProducto();
+            Integer cantidadVendida = detalle.getCantidad();
+
+
+            // Refrescar producto desde BD
+            Producto productoActual = productoRepository.findById(producto.getId())
+                    .orElseThrow(() -> new RuntimeException("Producto con ID " + producto.getId() + " no encontrado en el pedido " + pedido.getCodigo()));
+
+            int stockActual = productoActual.getStock();
+            int stockAnterior = productoActual.getStock();
+            if (stockActual < cantidadVendida) {
+                // La transacción hará rollback aquí
+                throw new RuntimeException("Stock insuficiente para '" + productoActual.getNombre() + "' (ID: " + productoActual.getId() + "). Stock: " + stockActual + ", Solicitado: " + cantidadVendida);
+            }
+
+            // Actualizar stock
+            int nuevoStock = stockActual - cantidadVendida;
+            productoActual.setStock(stockActual - cantidadVendida);
+
+            if (nuevoStock == 0) {
+                EstadoProducto estadoAgotado = estadoProductoRepository.findById(2)
+                        .orElseThrow(() -> new RuntimeException("El estado de producto 'Agotado' (ID 2) no está configurado."));
+
+                productoActual.setEstadoProducto(estadoAgotado);
+                System.out.println("Producto '" + productoActual.getNombre() + "' marcado como AGOTADO (Estado 2).");
+            }
+
+            productoRepository.save(productoActual);
+
+            // --- 📝 NUEVO: REGISTRAR TRANSACCIÓN (AUDITORÍA) ---
+            transaccionService.registrarAuditoriaVenta(
+                    productoActual,
+                    cantidadVendida,
+                    stockAnterior,
+                    nuevoStock,
+                    cajero,
+                    pedido.getCodigo()
+            );
+
+            // --- 🔔 LÓGICA DE ALERTA DE STOCK ---
+            if (nuevoStock <= 5) { // Si quedan 5 o menos (incluyendo 0)
+                if (correosStaff == null) {
+                    correosStaff = obtenerCorreosStaff(); // Obtener correos solo si es necesario
+                }
+                if (correosStaff.length > 0) {
+                    // Enviamos la alerta de forma asíncrona o directa
+                    emailService.enviarAlertaStock(correosStaff, productoActual, nuevoStock);
+                }
+            }
+            System.out.println("Stock actualizado para '" + productoActual.getNombre() + "': " + stockActual + " -> " + productoActual.getStock());
+        }
+        // --- FIN DESCONTAR STOCK ---
+
+        // 4. Buscar el estado "Completado"
+        EstadoPedido estadoCompletado = estadoPedidoRepository.findById(ESTADO_COMPLETADO)
+                .orElseThrow(() -> new RuntimeException("El estado 'Completado' (ID " + ESTADO_COMPLETADO + ") no está configurado."));
+
+        // 5. Actualizar estado del pedido y GUARDARLO
+        pedido.setEstadoPedido(estadoCompletado);
+        Pedido pedidoGuardado = pedidoRepository.save(pedido); // Guardamos para confirmar la transacción principal
+
+        // --- LÓGICA POST-TRANSACCIÓN (Notificaciones) ---
+        // Estas operaciones se intentan DESPUÉS de que el pedido se guardó como completado.
+        // Si fallan, no revierten el estado del pedido, solo se loguea el error.
+
+        byte[] facturaPdfBytes = null;
+        try {
+            // 6. Generar el PDF
+            facturaPdfBytes = facturaPdfService.generarFacturaPdf(pedidoGuardado, detalles);
+            System.out.println("PDF generado para pedido " + pedidoGuardado.getCodigo());
+        } catch (Exception e) {
+            // Si falla la generación del PDF, lo registramos pero continuamos para enviar el email sin adjunto.
+            System.err.println("ERROR al generar PDF para pedido " + pedidoGuardado.getCodigo() + ": " + e.getMessage());
+            e.printStackTrace(); // Imprime el stack trace completo para depuración
+        }
+
+        try {
+            // 7. Enviar el correo de agradecimiento (con o sin PDF)
+            emailService.enviarCorreoPedidoCompletado(pedidoGuardado, detalles, facturaPdfBytes);
+            System.out.println("Correo de pedido completado enviado para " + pedidoGuardado.getCodigo());
+        } catch (Exception e) {
+            // Si falla el envío del correo, solo registramos el error. El pedido ya está completado.
+            System.err.println("ERROR al enviar correo de pedido completado para " + pedidoGuardado.getCodigo() + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        // 8. Devolver el pedido actualizado
+        return pedidoGuardado;
+    }
+
+    private String[] obtenerCorreosStaff() {
+        // Buscar Admins (Rol 1) y Supervisores (Rol 4)
+        // Usamos buscarPorRolSql o findByRol si tienes la entidad Rol.
+        // Asumiendo que tienes buscarPorRolSql que devuelve lista de usuarios por ID de rol:
+        List<Usuario> admins = usuarioRepository.buscarPorRolSql(1);
+        List<Usuario> supervisores = usuarioRepository.buscarPorRolSql(4);
+
+        List<String> correos = new ArrayList<>();
+        admins.forEach(u -> correos.add(u.getCorreo()));
+        supervisores.forEach(u -> correos.add(u.getCorreo()));
+
+        return correos.toArray(new String[0]);
+    }
+
+
 }

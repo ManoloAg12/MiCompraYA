@@ -1,0 +1,114 @@
+<div th:fragment="content">
+  <div class="bg-gray-100 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+
+      <header class="mb-8 text-center">
+        <h1 class="text-4xl font-bold text-gray-900 tracking-tight">Procesar Pedido en Caja</h1>
+        <p class="mt-2 text-lg text-gray-600">Busca el pedido del cliente por su código único.</p>
+      </header>
+
+      <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 mb-8">
+        <form th:action="@{/caja/buscar}" method="post" id="buscarForm" class="space-y-4">
+          <div class="flex items-center space-x-4">
+            <label for="codigo" class="text-lg font-semibold text-gray-700 whitespace-nowrap">Código del Pedido:</label>
+            <input type="text" id="codigo" name="codigo" required autofocus
+                   class="flex-grow px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-lg uppercase tracking-wider"
+                   placeholder="ABC123XYZ">
+            <button type="submit"
+                    class="bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 transition duration-300 flex items-center gap-2 text-lg">
+              <i class="fa-solid fa-search"></i> Buscar
+            </button>
+            <button type="button" id="startScanButton"
+                    class="bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-600 transition duration-300 flex items-center gap-2 text-lg">
+              <i class="fa-solid fa-qrcode"></i> Escanear
+            </button>
+          </div>
+        </form>
+
+        <div id="qr-reader-container" class="mt-4 border-t pt-4" style="display: none;">
+          <p class="text-sm text-gray-600 mb-2 text-center">Apunte la cámara al código QR del cliente</p>
+          <div id="qr-reader" style="width: 100%; max-width: 400px; margin: auto;"></div>
+          <div class="text-center mt-3">
+            <button type="button" id="stopScanButton"
+                    class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 transition duration-300 text-sm">
+              Detener Escaneo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div th:if="${pedido != null}" class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+        <h2 class="text-3xl font-semibold text-gray-800 mb-6 border-b pb-4">Detalles del Pedido Encontrado</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+          <div>
+            <p class="text-sm text-gray-500 mb-1">Código del Pedido:</p>
+            <p class="text-2xl font-mono font-bold text-gray-900 bg-gray-100 p-2 rounded inline-block" th:text="${pedido.codigo}">CODIGO123</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500 mb-1">Cliente:</p>
+            <p class="text-xl font-semibold text-gray-800" th:text="${pedido.cliente?.nombreCompleto}">Nombre del Cliente</p>
+            <p class="text-sm text-gray-600" th:text="${pedido.cliente?.usuario?.correo}"></p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500 mb-1">Fecha del Pedido:</p>
+            <p class="text-lg text-gray-700" th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy HH:mm')}">Fecha</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500 mb-1">Método de Pago:</p>
+            <p class="text-lg font-medium text-gray-700" th:text="${pedido.tipoPago?.tipoPago}">Tipo Pago</p>
+          </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Productos en el Pedido:</h3>
+        <div class="divide-y divide-gray-200 border rounded-lg overflow-hidden mb-6">
+          <div class="grid grid-cols-5 gap-4 p-3 bg-gray-50 font-semibold text-gray-600 text-sm">
+            <div class="col-span-1 text-center">Imagen</div>
+            <div class="col-span-2">Producto</div>
+            <div class="text-center">Cantidad</div>
+            <div class="text-right">Subtotal</div>
+          </div>
+          <div th:each="detalle : ${detalles}" class="grid grid-cols-5 gap-4 p-3 items-center">
+            <div class="col-span-1 flex justify-center">
+              <img th:if="${detalle.producto?.urlImagen}"
+                   th:src="${detalle.producto.urlImagen}"
+                   alt="Imagen Producto"
+                   class="w-16 h-16 object-contain rounded border border-gray-200 p-1">
+              <div th:unless="${detalle.producto?.urlImagen}" class="w-16 h-16 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs border">
+                N/A
+              </div>
+            </div>
+            <div class="col-span-2">
+              <p class="font-medium text-gray-800" th:text="${detalle.producto?.nombre}">Nombre Producto</p>
+            </div>
+            <p class="text-center text-gray-700" th:text="${detalle.cantidad}">1</p>
+            <p class="text-right font-semibold text-gray-900" th:text="'$' + ${#numbers.formatDecimal(detalle.subtotal, 1, 2, 'POINT')}">$0.00</p>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center border-t pt-6">
+          <div>
+            <span class="text-2xl font-bold text-gray-900">Total a Cobrar:</span>
+            <span class="text-3xl font-bold text-green-600 ml-2" th:text="'$' + ${#numbers.formatDecimal(pedido.total, 1, 2, 'POINT')}">$0.00</span>
+          </div>
+          <form th:action="@{/caja/procesar/{id}(id=${pedido.id})}" method="post">
+            <button type="submit"
+                    class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300 text-lg flex items-center gap-2">
+              <i class="fa-solid fa-check-circle"></i> Procesar Compra
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div id="toast-container" class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 11; display: none;width: 40%;"></div>
+      <input type="hidden" id="tipo-toast" th:value="${tipo}">
+      <input type="hidden" id="mensaje-toast" th:value="${mensaje}">
+
+    </div>
+  </div>
+
+ 
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script th:src="@{/js/escanear.js}"></script>
+
+</div>

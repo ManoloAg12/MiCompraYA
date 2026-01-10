@@ -38,7 +38,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     List<Usuario> buscarPorRol(@Param("rol") String rol);
 
     //buscar un usuario por nombre del rol en lenguaje sql nativo;
-    @Query(value = "SELECT * FROM usuario u WHERE u.id_rol = :rol", nativeQuery = true)
+    @Query(value = "SELECT * FROM usuarios u WHERE u.id_rol = :rol", nativeQuery = true)
     List<Usuario> buscarPorRolSql(@Param("rol") Integer rol);
 
     //llamar una funcion de la base de datos usando select para las funciones

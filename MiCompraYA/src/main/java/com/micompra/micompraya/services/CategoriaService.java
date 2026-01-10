@@ -4,6 +4,7 @@ import com.micompra.micompraya.models.Categoria;
 import com.micompra.micompraya.repositories.CategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +22,11 @@ public class CategoriaService {
     //buscar categoria por id
     public Categoria findById(Integer id) {
         return categoriaRepository.findById(id).orElse(null);
+    }
+
+    @Transactional
+    public void guardar(Categoria categoria) {
+        categoriaRepository.save(categoria);
     }
 
 }
