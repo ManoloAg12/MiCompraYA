@@ -6,7 +6,7 @@ COPY . .
 # Entramos a la carpeta donde está el pom.xml
 WORKDIR /MiCompraYA
 
-RUN mvn clean package -DskipTests
+RUN mvn clean package -DskipTests -B
 
 # Etapa de ejecución
 FROM openjdk:17.0.1-jdk-slim
